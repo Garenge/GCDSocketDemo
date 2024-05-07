@@ -1,0 +1,20 @@
+PODS:
+  - CocoaAsyncSocket (7.6.5)
+  - SnapKit (5.6.0)
+
+DEPENDENCIES:
+  - CocoaAsyncSocket
+  - SnapKit
+
+SPEC REPOS:
+  trunk:
+    - CocoaAsyncSocket
+    - SnapKit
+
+SPEC CHECKSUMS:
+  CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
+  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+
+PODFILE CHECKSUM: 43113c7624a6cc0c29e1a6329e68c7deaa951a0e
+
+COCOAPODS: 1.11.3

@@ -7,15 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		81C996EF1F8FAD39E278D471 /* Pods_GCDSocketDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */; };
 		9D0FA6F02A1488830091D0E7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */; };
 		9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */; };
 		9D0FA6F42A1488830091D0E7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F32A1488830091D0E7 /* ViewController.swift */; };
 		9D0FA6F72A1488830091D0E7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F52A1488830091D0E7 /* Main.storyboard */; };
 		9D0FA6F92A1488840091D0E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F82A1488840091D0E7 /* Assets.xcassets */; };
 		9D0FA6FC2A1488840091D0E7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6FA2A1488840091D0E7 /* LaunchScreen.storyboard */; };
+		9D0FA7042A1489F50091D0E7 /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7032A1489F50091D0E7 /* Server.swift */; };
+		9D0FA7062A1489FE0091D0E7 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7052A1489FE0091D0E7 /* Client.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GCDSocketDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0FA6EC2A1488830091D0E7 /* GCDSocketDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GCDSocketDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -24,6 +28,11 @@
 		9D0FA6F82A1488840091D0E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9D0FA6FB2A1488840091D0E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9D0FA6FD2A1488840091D0E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9D0FA7032A1489F50091D0E7 /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
+		9D0FA7052A1489FE0091D0E7 /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		9D0FA70B2A1495950091D0E7 /* GCDSocketDemo-Brigding-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GCDSocketDemo-Brigding-Header.h"; sourceTree = "<group>"; };
+		DD03948A9DD25EBA0088A7E6 /* Pods-GCDSocketDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GCDSocketDemo.release.xcconfig"; path = "Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo.release.xcconfig"; sourceTree = "<group>"; };
+		E330B0528B2C627878E6B58C /* Pods-GCDSocketDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GCDSocketDemo.debug.xcconfig"; path = "Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,17 +40,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81C996EF1F8FAD39E278D471 /* Pods_GCDSocketDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1A5CD081FA43CEDB953F5758 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2183F8CAC66AD361B38A1E12 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E330B0528B2C627878E6B58C /* Pods-GCDSocketDemo.debug.xcconfig */,
+				DD03948A9DD25EBA0088A7E6 /* Pods-GCDSocketDemo.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		9D0FA6E32A1488830091D0E7 = {
 			isa = PBXGroup;
 			children = (
 				9D0FA6EE2A1488830091D0E7 /* GCDSocketDemo */,
 				9D0FA6ED2A1488830091D0E7 /* Products */,
+				2183F8CAC66AD361B38A1E12 /* Pods */,
+				1A5CD081FA43CEDB953F5758 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -59,9 +88,12 @@
 				9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */,
 				9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */,
 				9D0FA6F32A1488830091D0E7 /* ViewController.swift */,
+				9D0FA7032A1489F50091D0E7 /* Server.swift */,
+				9D0FA7052A1489FE0091D0E7 /* Client.swift */,
 				9D0FA6F52A1488830091D0E7 /* Main.storyboard */,
 				9D0FA6F82A1488840091D0E7 /* Assets.xcassets */,
 				9D0FA6FA2A1488840091D0E7 /* LaunchScreen.storyboard */,
+				9D0FA70B2A1495950091D0E7 /* GCDSocketDemo-Brigding-Header.h */,
 				9D0FA6FD2A1488840091D0E7 /* Info.plist */,
 			);
 			path = GCDSocketDemo;
@@ -74,9 +106,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9D0FA7002A1488840091D0E7 /* Build configuration list for PBXNativeTarget "GCDSocketDemo" */;
 			buildPhases = (
+				BA34EDF8352909BE409C1F32 /* [CP] Check Pods Manifest.lock */,
 				9D0FA6E82A1488830091D0E7 /* Sources */,
 				9D0FA6E92A1488830091D0E7 /* Frameworks */,
 				9D0FA6EA2A1488830091D0E7 /* Resources */,
+				F3F86F89C6F54A6443B29FAC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -133,6 +167,48 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		BA34EDF8352909BE409C1F32 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-GCDSocketDemo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F3F86F89C6F54A6443B29FAC /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		9D0FA6E82A1488830091D0E7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -140,7 +216,9 @@
 			files = (
 				9D0FA6F42A1488830091D0E7 /* ViewController.swift in Sources */,
 				9D0FA6F02A1488830091D0E7 /* AppDelegate.swift in Sources */,
+				9D0FA7042A1489F50091D0E7 /* Server.swift in Sources */,
 				9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */,
+				9D0FA7062A1489FE0091D0E7 /* Client.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,11 +360,13 @@
 		};
 		9D0FA7012A1488840091D0E7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E330B0528B2C627878E6B58C /* Pods-GCDSocketDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = E7W6597ZYH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GCDSocketDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -294,6 +374,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -302,6 +383,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = lzp.GCDSocketDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/GCDSocketDemo-Brigding-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -309,11 +391,13 @@
 		};
 		9D0FA7022A1488840091D0E7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DD03948A9DD25EBA0088A7E6 /* Pods-GCDSocketDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = E7W6597ZYH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GCDSocketDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -321,6 +405,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -329,6 +414,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = lzp.GCDSocketDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/GCDSocketDemo-Brigding-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
