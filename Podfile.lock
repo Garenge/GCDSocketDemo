@@ -1,20 +1,24 @@
 PODS:
   - CocoaAsyncSocket (7.6.5)
+  - PPCustomAsyncOperation (0.1.1)
   - SnapKit (5.6.0)
 
 DEPENDENCIES:
   - CocoaAsyncSocket
+  - PPCustomAsyncOperation
   - SnapKit
 
 SPEC REPOS:
   trunk:
     - CocoaAsyncSocket
+    - PPCustomAsyncOperation
     - SnapKit
 
 SPEC CHECKSUMS:
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
+  PPCustomAsyncOperation: f452884e64b75ee1aab9322490a5e77394cae9af
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
 
-PODFILE CHECKSUM: 43113c7624a6cc0c29e1a6329e68c7deaa951a0e
+PODFILE CHECKSUM: c6810769e8f3f4e9013a3a3654491fbfa9a9cdce
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.15.2

@@ -8,5 +8,7 @@ target 'GCDSocketDemo' do
   # Pods for GCDSocketDemo
   pod 'CocoaAsyncSocket'
   pod 'SnapKit'
+  pod 'PPCustomAsyncOperation'
+
 
 end

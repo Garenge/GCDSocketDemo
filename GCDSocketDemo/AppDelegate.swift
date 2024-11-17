@@ -10,10 +10,20 @@ import UIKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    func getDocumentDirectory() -> String {
+        let docuPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory,
+                                                            .userDomainMask, true)
+        let docuPath = docuPaths[0]
+            // print(docuPath)
+        return docuPath
+    }
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        // 打印document文件夹目录
+        
+        print(getDocumentDirectory())
         return true
     }
 
