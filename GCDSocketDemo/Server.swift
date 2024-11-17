@@ -56,6 +56,7 @@ let maxBodyLength = 12 * 1024
 
 extension Server {
     // 发送消息
+    // TODO: 后期方法, 封装成传参形式, 将文件地址传进来, 然后使用流式读取, 避免一次性读取文件过大, 导致内存暴涨
     func sendMessage() {
 
 //        let string = "Server" + "-\(count)"

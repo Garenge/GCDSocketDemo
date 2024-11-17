@@ -102,10 +102,14 @@ extension Client: GCDAsyncSocketDelegate {
         print("1数据共\(bodyCount)包, 当前第\(bodyIndex)包, 此包大小: \(data.count - parseIndex), 总大小: \(messageBody!.totalBodyLength)")
         messageBody?.bodyCount = bodyCount
         messageBody?.bodyIndex = bodyIndex
-//        
+//
+        
+            // TODO: 后期方法, 当我通过前一个包, 或者两个包, 能获取到json的数据之后, 解析, 发现是文件的话, 就将后续的文件流直接写到文件中去, 避免内存暴涨
         messageBody?.bodyData.append(data.subdata(in: parseIndex..<data.count))
         if (bodyCount == bodyIndex + 1) {
             print("数据所有包都合并完成")
+            
+            
             
             guard let jsonCountStr = String(data: messageBody!.bodyData.subdata(in: 0..<8), encoding: .utf8), let jsonCount = Int(jsonCountStr) else {
                 return
