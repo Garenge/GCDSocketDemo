@@ -44,136 +44,33 @@ class Server: NSObject {
     var count = 0
 }
 
-    //20个长度, 事件名称, 无业务意义, 仅用作判断相同消息
-    //8个长度, 包的个数 // 一个包, 最大 8k = 8 * 1024, 其中还有开头的 20+8+8
-    //8个长度, 包的序号
-    //8个长度, 转换成字符串, 表示接下来的json长度
-    //json体
-    //8个长度, 转换成字符串, 表示接下来的data长度
-    //二进制流
-let maxBodyLength = 12 * 1024
-
 extension Server {
     
-    func sendFileData(filePath: String?) {
-        
-        let preFixLength = 20 + 8 + 8
-        
-        var json: [String: Any] = ["userName": "garenge", "timeStamp": Date().timeIntervalSince1970]
-        var fileSize = 0
-        
-            // 由于文件不能完全加载成data, 容易内存爆炸, 所以文件改成流式获取
-        if
-            let filePath = filePath, FileManager.default.fileExists(atPath: filePath),
-            let attributes = try? FileManager.default.attributesOfItem(atPath: filePath),
-            let size = attributes[.size] as? NSNumber,
-            size.int64Value > 0 {
-            fileSize = size.intValue
-            json["file"] = ["fileName": "test.txt", "filePath": filePath, "fileSize": fileSize]
+    func sendJsonData(data: Data) {
+        MessageManager.makeJsonBodyData(data: data) { [weak self] (bodyData, totalBodyCount, index) in
+            self?.sendCellBodyData(bodyData: bodyData, messageType: .json, totalBodyCount: totalBodyCount, index: index)
         }
+        count += 1
+    }
+    
+    func sendFileData(filePath: String) {
         
-            // json一般都在可控范围, 所以json直接获取data
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) else {
-            return
+        
+        MessageManager.makeFileBodyData(filePath: filePath) { [weak self] (bodyData, totalBodyCount, index) in
+            self?.sendCellBodyData(bodyData: bodyData, messageType: .file, totalBodyCount: totalBodyCount, index: index)
+        } failureBlock: { msg in
+            print(msg)
         }
-        
-            // 20 8 8   8  json  8  fileData
-            // 所有的数据分包, 每个包由于有固定的开头20+8+8个字节, 所以每个包最多放maxBodyLength - 20 - 8 - 8个长度
-        let totalBodySize = 8 + jsonData.count + 8 + fileSize
-        let cellBodyLength = maxBodyLength - preFixLength
-        let totalBodyCount = (totalBodySize + cellBodyLength - 1) / cellBodyLength
-        
-            // 整理整个数据, 发现前面数据基本都是可控的, 整块数据可以分成两段, (20 8 8   8  json  8)  fileData
-        let preData = {
-            var bodyData = Data()
-                //8个长度, 转换成字符串, 表示接下来的json长度
-            let jsonLength = String(format: "%08d", jsonData.count)
-            bodyData.append(jsonLength.data(using: .utf8)!)
-                //json体
-            bodyData.append(jsonData)
-                //8个长度, 转换成字符串, 表示接下来的data长度
-            let fileLength = String(format: "%08d", fileSize)
-            bodyData.append(fileLength.data(using: .utf8)!)
-            return bodyData
-        }()
-            // 创建一个下标, 从左往右按顺序截取data, 发送数据
-        
-        var sepIndex = 0
-        var cellBodyIndex = 0
-        
-        var fileHandler: FileHandle? = fileSize > 0 ? FileHandle(forReadingAtPath: filePath!) : nil
-        try? fileHandler?.seek(toOffset: 0)
-        
-        while sepIndex < totalBodySize {
-                // 从上一个下标开始, 取长度为 maxBodyLength - preFixLength 的流
-            if sepIndex + maxBodyLength - preFixLength < preData.count {
-                    // 还没取到file
-                let bodyData = preData.subdata(in: sepIndex..<(sepIndex + maxBodyLength - preFixLength))
-                self.sendCellBodyData(bodyData: bodyData, totalBodyCount: totalBodyCount, index: cellBodyIndex)
-                sepIndex += maxBodyLength - preFixLength
-                cellBodyIndex += 1
-            } else {
-                    // 右边已经到了file
-                var bodyData = Data()
-                var fileReadCount = 0
-                if sepIndex < preData.count {
-                    // 左脚在前一块, 后脚在data, 先把前一部分给放到bodyData中
-                    bodyData.append(preData.subdata(in: sepIndex..<preData.count))
-                    fileReadCount = maxBodyLength - preFixLength - (preData.count - sepIndex)
-                    sepIndex = preData.count - sepIndex
-                } else {
-                    fileReadCount = maxBodyLength - preFixLength
-                }
-                
-                // fileReadCount表示这一次最多还可以读多少数据
-                if fileReadCount >= totalBodySize - sepIndex {
-                    // 说明这一次可以把文件全取完了
-                    if fileSize > 0 {
-                        let data = fileHandler!.readData(ofLength: totalBodySize - sepIndex)
-                        bodyData.append(data)
-                    }
-                    sepIndex = totalBodySize
-                } else {
-                    // 文件只能取一部分
-                    let data = fileHandler!.readData(ofLength: fileReadCount)
-                    bodyData.append(data)
-                    try? fileHandler?.seek(toOffset: UInt64(sepIndex + fileReadCount - preData.count))
-                    sepIndex += fileReadCount
-                }
-                
-                self.sendCellBodyData(bodyData: bodyData, totalBodyCount: totalBodyCount, index: cellBodyIndex)
-                cellBodyIndex += 1
-            }
-            
-        }
-        fileHandler?.closeFile()
         
         count += 1
     }
     
-    func sendCellBodyData(bodyData: Data, totalBodyCount: Int, index: Int) {
-        var sendData = Data()
-        
-            //20个长度, 区分分包数据
-        let oneKey = String(format: "%020d", count)
-        sendData.append(oneKey.data(using: .utf8)!)
-        
-            //8个长度, 包的个数 // 一个包, 最大 8k = 8 * 1024, 其中还有开头的 2+8+8
-        let bodyCount = String(format: "%08lld", totalBodyCount)
-        sendData.append(bodyCount.data(using: .utf8)!)
-            //8个长度, 包的序号
-        let bodyIndex = String(format: "%08lld", index)
-        sendData.append(bodyIndex.data(using: .utf8)!)
-        
-        print("0数据共\(totalBodyCount)包, 当前第\(index)包, 此包大小: \(bodyData.count)")
-        sendData.append(bodyData)
+    func sendCellBodyData(bodyData: Data, messageType: MessageManager.MessageType, totalBodyCount: Int, index: Int) {
+        let sendData = MessageManager.makeCellBodyData(bodyData: bodyData, messageCode: String(format: "%018d", count), messageType: messageType, totalBodyCount: totalBodyCount, index: index)
         
         let operation = PPCustomAsyncOperation()
         operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
             self?.clientSocket?.write(sendData, withTimeout: -1, tag: 10086)
-                //                DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
-                //                    operation.finish()
-                //                }
             return false
         }
         queue.addOperation(operation)
@@ -184,7 +81,30 @@ extension Server {
         
             //        let string = "Server" + "-\(count)"
             //        let data = string.data(using: .utf8)  okzxVsJNxXc
-        let filePath = Bundle.main.path(forResource: "okzxVsJNxXc", ofType: "jpg")
+        
+            //        var json: [String: Any] = ["userName": "garenge", "timeStamp": Date().timeIntervalSince1970]
+            //        var fileSize = 0
+            //
+            //            // 由于文件不能完全加载成data, 容易内存爆炸, 所以文件改成流式获取
+            //        if
+            //            let filePath = filePath, FileManager.default.fileExists(atPath: filePath),
+            //            let attributes = try? FileManager.default.attributesOfItem(atPath: filePath),
+            //            let size = attributes[.size] as? NSNumber,
+            //            size.int64Value > 0 {
+            //            fileSize = size.intValue
+            //            json["file"] = ["fileName": "test.txt", "filePath": filePath, "fileSize": fileSize]
+            //        }
+            //
+            //            // json一般都在可控范围, 所以json直接获取data
+            //        guard let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) else {
+            //            return
+            //        }
+        
+        
+        guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc", ofType: "jpg") else {
+            print("文件不存在")
+            return
+        }
         self.sendFileData(filePath: filePath)
     }
 }
