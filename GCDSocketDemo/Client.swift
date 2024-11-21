@@ -96,6 +96,7 @@ extension Client: GCDAsyncSocketDelegate {
         if MessageManager.MessageType(rawValue: messageType) != .file {
             return
         }
+        parseIndex += 2
         
         guard let bodyCountStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let bodyCount = Int(bodyCountStr) else { return }
         parseIndex += 8
