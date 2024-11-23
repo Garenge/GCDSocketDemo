@@ -60,31 +60,8 @@ extension Client {
         // print(docuPath)
         return docuPath
     }
-}
-
-extension Client: GCDAsyncSocketDelegate {
     
-    func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
-        print("Client 已连接 \(host):\(port)")
-        self.socket.readData(withTimeout: -1, tag: 10086)
-    }
-    
-    func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-        print("Client 已断开: \(String(describing: err))")
-    }
-    
-    func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
-        let string = String(data: data, encoding: .utf8)
-        print("Client 已收到消息: \(String(describing: string))")
-        
-        
-        //20个长度, 事件名称, 无业务意义, 仅用作判断相同消息
-        //8个长度, 包的个数 // 一个包, 最大 8k = 8 * 1024, 其中还有开头的 20+8+8
-        //8个长度, 包的序号
-        //8个长度, 转换成字符串, 表示接下来的data长度
-        //二进制流
-        self.socket.readData(withTimeout: -1, tag: 10086)
-        
+    func didReceiveData(data: Data) {
         if (data.count < 20+8+8) {
             return
         }
@@ -142,6 +119,34 @@ extension Client: GCDAsyncSocketDelegate {
         } else {
             print("数据所有包未合并完成, 共\(bodyCount)包, 当前第\(bodyIndex)包, 继续等待")
         }
+    }
+}
+
+extension Client: GCDAsyncSocketDelegate {
+    
+    func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
+        print("Client 已连接 \(host):\(port)")
+        self.socket.readData(withTimeout: -1, tag: 10086)
+    }
+    
+    func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
+        print("Client 已断开: \(String(describing: err))")
+    }
+    
+    func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
+        let string = String(data: data, encoding: .utf8)
+        print("Client 已收到消息: \(String(describing: string))")
+        
+        self.didReceiveData(data: data)
+        
+        //20个长度, 事件名称, 无业务意义, 仅用作判断相同消息
+        //8个长度, 包的个数 // 一个包, 最大 8k = 8 * 1024, 其中还有开头的 20+8+8
+        //8个长度, 包的序号
+        //8个长度, 转换成字符串, 表示接下来的data长度
+        //二进制流
+        self.socket.readData(withTimeout: -1, tag: 10086)
+        
+        
     }
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
