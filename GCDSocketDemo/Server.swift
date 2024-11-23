@@ -1,9 +1,9 @@
-    //
-    //  Server.swift
-    //  GCDSocketDemo
-    //
-    //  Created by Garenge on 2023/5/17.
-    //
+//
+//  Server.swift
+//  GCDSocketDemo
+//
+//  Created by Garenge on 2023/5/17.
+//
 
 import Foundation
 import PPCustomAsyncOperation
@@ -29,15 +29,15 @@ class Server: NSObject {
         }
     }
     
-        //    func connect() {
-        //        if !self.socket.isConnected {
-        //            do {
-        //                try self.socket.connect(toHost: "127.0.0.1", onPort: 8888, withTimeout: -1)
-        //            } catch {
-        //                print("Server connect to socket error: \(error)")
-        //            }
-        //        }
-        //    }
+    //    func connect() {
+    //        if !self.socket.isConnected {
+    //            do {
+    //                try self.socket.connect(toHost: "127.0.0.1", onPort: 8888, withTimeout: -1)
+    //            } catch {
+    //                print("Server connect to socket error: \(error)")
+    //            }
+    //        }
+    //    }
     
     var clientSocket: GCDAsyncSocket?
     
@@ -81,33 +81,33 @@ extension Server {
         }
         queue.addOperation(operation)
     }
-        // 发送消息
-        // TODO: 后期方法, 封装成传参形式, 将文件地址传进来, 然后使用流式读取, 避免一次性读取文件过大, 导致内存暴涨
+    // 发送消息
+    // TODO: 后期方法, 封装成传参形式, 将文件地址传进来, 然后使用流式读取, 避免一次性读取文件过大, 导致内存暴涨
     func sendMessage() {
         
-            //        let string = "Server" + "-\(count)"
-            //        let data = string.data(using: .utf8)  okzxVsJNxXc
+        //        let string = "Server" + "-\(count)"
+        //        let data = string.data(using: .utf8)  okzxVsJNxXc
         
-            //        var json: [String: Any] = ["userName": "garenge", "timeStamp": Date().timeIntervalSince1970]
-            //        var fileSize = 0
-            //
-            //            // 由于文件不能完全加载成data, 容易内存爆炸, 所以文件改成流式获取
-            //        if
-            //            let filePath = filePath, FileManager.default.fileExists(atPath: filePath),
-            //            let attributes = try? FileManager.default.attributesOfItem(atPath: filePath),
-            //            let size = attributes[.size] as? NSNumber,
-            //            size.int64Value > 0 {
-            //            fileSize = size.intValue
-            //            json["file"] = ["fileName": "test.txt", "filePath": filePath, "fileSize": fileSize]
-            //        }
-            //
-            //            // json一般都在可控范围, 所以json直接获取data
-            //        guard let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) else {
-            //            return
-            //        }
+        //        var json: [String: Any] = ["userName": "garenge", "timeStamp": Date().timeIntervalSince1970]
+        //        var fileSize = 0
+        //
+        //            // 由于文件不能完全加载成data, 容易内存爆炸, 所以文件改成流式获取
+        //        if
+        //            let filePath = filePath, FileManager.default.fileExists(atPath: filePath),
+        //            let attributes = try? FileManager.default.attributesOfItem(atPath: filePath),
+        //            let size = attributes[.size] as? NSNumber,
+        //            size.int64Value > 0 {
+        //            fileSize = size.intValue
+        //            json["file"] = ["fileName": "test.txt", "filePath": filePath, "fileSize": fileSize]
+        //        }
+        //
+        //            // json一般都在可控范围, 所以json直接获取data
+        //        guard let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) else {
+        //            return
+        //        }
         
         
-        guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc", ofType: "jpg") else {
+        guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
             print("文件不存在")
             return
         }
@@ -119,7 +119,6 @@ extension Server: GCDAsyncSocketDelegate {
     
     func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         print("Server 已连接 \(host):\(port)")
-            //        self.clientSocket?.readData(withTimeout: -1, tag: 10086)
     }
     
     func socket(_ sock: GCDAsyncSocket, didAcceptNewSocket newSocket: GCDAsyncSocket) {
