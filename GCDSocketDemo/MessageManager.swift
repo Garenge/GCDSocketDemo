@@ -28,7 +28,7 @@ class MessageManager: NSObject {
         // 所有的数据分包, 每个包由于有固定的开头20+8+8个字节, 所以每个包最多放maxBodyLength - 20 - 8 - 8个长度
         let preFixLength = 20 + 8 + 8
         // 整理整个数据, 发现前面数据基本都是可控的, 整块数据可以分成两段, 8 + data
-        let preData = {
+        let preData = { () -> Data in
             var bodyData = Data()
             //8个长度, 转换成字符串, 表示接下来的json长度
             let length = String(format: "%08d", data.count)
@@ -82,9 +82,9 @@ class MessageManager: NSObject {
         let totalBodySize = 8 + fileSize
         let cellBodyLength = maxBodyLength - preFixLength
         let totalBodyCount = (totalBodySize + cellBodyLength - 1) / cellBodyLength
-        
+
         // 整理整个数据, 发现前面数据基本都是可控的, 整块数据可以分成两段, (20 8 8   8  json  8)  fileData
-        let preData = {
+        let preData = { () -> Data in
             var bodyData = Data()
             //8个长度, 转换成字符串, 表示接下来的data长度
             let fileLength = String(format: "%08d", fileSize)

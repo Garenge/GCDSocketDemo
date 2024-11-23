@@ -41,6 +41,8 @@ class Client: NSObject {
     }
     
     var count = 0
+
+    var receiveBuffer = Data()
 }
 
 extension Client {
@@ -96,26 +98,29 @@ extension Client {
         //
         if nil == messageBody?.fileHandle {
             messageBody?.filePath = getDocumentDirectory() + "/buubbubu.jpg"
-            
-            let fileHandle = FileHandle(forWritingAtPath: messageBody!.filePath!)
-            messageBody?.fileHandle = fileHandle
+            if let filePath = messageBody?.filePath {
+                try? FileManager.default.removeItem(atPath: filePath)
+                if !FileManager.default.fileExists(atPath: filePath) {
+                    FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
+                }
+                let fileHandle = FileHandle(forWritingAtPath: filePath)
+                messageBody?.fileHandle = fileHandle
+            }
+
         }
         
         // TODO: 后期方法, 当我通过前一个包, 或者两个包, 能获取到json的数据之后, 解析, 发现是文件的话, 就将后续的文件流直接写到文件中去, 避免内存暴涨
+
+
+
         messageBody?.fileHandle?.write(data.subdata(in: parseIndex..<data.count))
         try? messageBody?.fileHandle?.seek(toOffset: UInt64(messageBody!.totalBodyLength))
         
         if (bodyCount == bodyIndex + 1) {
             print("数据所有包都合并完成")
-            
-            if let filePath = messageBody?.filePath, FileManager.default.fileExists(atPath: filePath) {
-                print("收到文件, 写入成功")
-            } else {
-                print("收到文件, 写入失败")
-            }
+            try? messageBody?.fileHandle?.close()
             self.receivedMessageDic[messageKey] = nil
-            
-            
+
         } else {
             print("数据所有包未合并完成, 共\(bodyCount)包, 当前第\(bodyIndex)包, 继续等待")
         }
@@ -134,19 +139,45 @@ extension Client: GCDAsyncSocketDelegate {
     }
     
     func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
-        let string = String(data: data, encoding: .utf8)
-        print("Client 已收到消息: \(String(describing: string))")
+//        let string = String(data: data, encoding: .utf8)
+//        print("Client 已收到消息: \(String(describing: string))")
+//
+//        self.didReceiveData(data: data)
+//
+//        //20个长度, 事件名称, 无业务意义, 仅用作判断相同消息
+//        //8个长度, 包的个数 // 一个包, 最大 8k = 8 * 1024, 其中还有开头的 20+8+8
+//        //8个长度, 包的序号
+//        //8个长度, 转换成字符串, 表示接下来的data长度
+//        //二进制流
+//        self.socket.readData(withTimeout: -1, tag: 10086)
         
-        self.didReceiveData(data: data)
-        
-        //20个长度, 事件名称, 无业务意义, 仅用作判断相同消息
-        //8个长度, 包的个数 // 一个包, 最大 8k = 8 * 1024, 其中还有开头的 20+8+8
-        //8个长度, 包的序号
-        //8个长度, 转换成字符串, 表示接下来的data长度
-        //二进制流
-        self.socket.readData(withTimeout: -1, tag: 10086)
-        
-        
+        // 将新收到的数据追加到缓冲区
+        print("Client 已收到消息:")
+            receiveBuffer.append(data)
+
+            while receiveBuffer.count >= 8 { // 包头长度为 4 字节
+                // 读取包头，解析包体长度
+                let lengthData = receiveBuffer.subdata(in: 0..<8)
+                let length = Int(String(data: lengthData, encoding: .utf8) ?? "0") ?? 0// lengthData.withUnsafeBytes { $0.load(as: UInt32.self).bigEndian }
+
+                if receiveBuffer.count >= 8 + length {
+                    // 获取完整包
+                    let completePacket = receiveBuffer.subdata(in: 8..<(8 + length))
+
+                    // 处理完整包数据
+//                    handlePacket(completePacket)
+                    self.didReceiveData(data: completePacket)
+
+                    // 移除已处理的包
+                    receiveBuffer.removeSubrange(0..<(8 + length))
+                } else {
+                    // 数据不完整，等待更多数据
+                    break
+                }
+            }
+
+            // 继续读取数据
+            sock.readData(withTimeout: -1, tag: tag)
     }
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {

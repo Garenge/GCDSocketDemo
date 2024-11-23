@@ -7,16 +7,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1BF17E2A-9680-4AE7-81BE-69CF7247A8B1"
+            uuid = "EEC2983E-05A1-47DB-B881-871CD35EB311"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "GCDSocketDemo/MessageManager.swift"
+            filePath = "GCDSocketDemo/Client.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "83"
-            endingLineNumber = "83"
-            landmarkName = "makeFileBodyData(filePath:cellMessageBlock:failureBlock:)"
+            startingLineNumber = "67"
+            endingLineNumber = "67"
+            landmarkName = "didReceiveData(data:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C27CEFBF-EC33-4188-8E3C-AD551A34FA39"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GCDSocketDemo/Client.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "160"
+            endingLineNumber = "160"
+            landmarkName = "socket(_:didRead:withTag:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
