@@ -102,9 +102,13 @@ extension Client {
         print("1数据共\(bodyCount)包, 当前第\(bodyIndex)包, 此包大小: \(data.count - parseIndex), 总大小: \(messageBody!.totalBodyLength)")
         messageBody?.bodyCount = bodyCount
         messageBody?.bodyIndex = bodyIndex
-        //
+        
+        // TODO: 根据messageTypeStr区分是文件, 还是json, 选择合适的方式拼接data
+        
         if nil == messageBody?.fileHandle {
-            messageBody?.filePath = getDocumentDirectory() + "/buubbubu.jpg"
+            // TODO: 理论上, 客户端先请求文件, 然后服务端开始发送文件, 所以客户端是知道文件格式的, 这里可以根据文件格式来确定文件后缀名
+            let fileName = messageKey + ".jpg"
+            messageBody?.filePath = getDocumentDirectory() + "/" + fileName
             print("文件地址: \(messageBody?.filePath ?? "")")
             if let filePath = messageBody?.filePath {
                 try? FileManager.default.removeItem(atPath: filePath)
@@ -114,7 +118,6 @@ extension Client {
                 let fileHandle = FileHandle(forWritingAtPath: filePath)
                 messageBody?.fileHandle = fileHandle
             }
-            
         }
         
         // 将文件流直接写到文件中去, 避免内存暴涨
@@ -146,19 +149,6 @@ extension Client: GCDAsyncSocketDelegate {
     }
     
     func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
-        //        let string = String(data: data, encoding: .utf8)
-        //        print("Client 已收到消息: \(String(describing: string))")
-        //
-        //        self.didReceiveData(data: data)
-        //
-        //        //20个长度, 事件名称, 无业务意义, 仅用作判断相同消息
-        //        //8个长度, 包的个数 // 一个包, 最大 8k = 8 * 1024, 其中还有开头的 20+8+8
-        //        //8个长度, 包的序号
-        //        // 8个长度, 这个包有多长
-        //        //16个长度, 转换成字符串, 表示接下来的data长度
-        //        //二进制流
-        //        self.socket.readData(withTimeout: -1, tag: 10086)
-        
         // 将新收到的数据追加到缓冲区
         print("Client 已收到消息:")
         receiveBuffer.append(data)

@@ -10,11 +10,12 @@ import PPCustomAsyncOperation
 
 class Server: NSObject {
     
-//    lazy var queue: PPCustomOperationQueue = {
-//        let queue = PPCustomOperationQueue()
-//        queue.maxConcurrentOperationCount = 1;
-//        return queue
-//    }()
+    /// 多文件排序发送
+    lazy var queue: PPCustomOperationQueue = {
+        let queue = PPCustomOperationQueue()
+        queue.maxConcurrentOperationCount = 1;
+        return queue
+    }()
     
     lazy var socket: GCDAsyncSocket = {
         let socket = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
@@ -44,81 +45,71 @@ class Server: NSObject {
     /// 标记发送事件, 处理完一个事件, 可以+1
     var count = 0
     
-    /// 消息管理
-    var messageManager: MessageManager = MessageManager()
+    /// 消息管理, 当前的消息体, 任务自动跟随执行
+    var messageManager: MessageManager?
 }
 
 extension Server {
     
     func sendJsonData(data: Data) {
-        messageManager.makeJsonBodyData(data: data) { [weak self] (bodyData, totalBodyCount, index) in
-            self?.sendCellBodyData(bodyData: bodyData, messageType: .json, totalBodyCount: totalBodyCount, index: index)
-        }
-        count += 1
+//        messageManager.makeJsonBodyData(data: data) { [weak self] (bodyData, totalBodyCount, index) in
+//            self?.sendCellBodyData(bodyData: bodyData, messageType: .json, totalBodyCount: totalBodyCount, index: index)
+//        }
+//        count += 1
     }
     
     func sendFileData(filePath: String) {
-        if !messageManager.hasAllMessageDone { return }
-        messageManager.hasAllMessageDone = false
-        self.messageManager.readFilePath = filePath
         
-        self.sendBodyMessage()
+        let operation = PPCustomAsyncOperation()
+        operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
+            self?.messageManager = MessageManager()
+            self?.messageManager?.hasAllMessageDone = false
+            self?.messageManager?.readFilePath = filePath
+            self?.sendBodyMessage()
+            return false
+        }
+        queue.addOperation(operation)
     }
     
     func sendBodyMessage() {
-        messageManager.makeFileBodyData { [weak self] (bodyData, totalBodyCount, index) in
+        self.messageManager?.makeFileBodyData { [weak self] (bodyData, totalBodyCount, index) in
             if index < totalBodyCount {
                 self?.sendCellBodyData(bodyData: bodyData, messageType: .file, totalBodyCount: totalBodyCount, index: index)
             }
         } finishedAllTask: { [weak self] in
+            
+            /// 上个任务结束
             self?.count += 1
+            self?.messageManager = nil
+            (self?.queue.operations.first as? PPCustomAsyncOperation)?.finish()
         } failureBlock: { msg in
             print(msg)
         }
     }
     
     func sendCellBodyData(bodyData: Data, messageType: MessageManager.MessageType, totalBodyCount: Int, index: Int) {
-        let sendData = messageManager.makeCellBodyData(bodyData: bodyData, messageCode: String(format: "%018d", count), messageType: messageType, totalBodyCount: totalBodyCount, index: index)
-        
-//        let operation = PPCustomAsyncOperation()
-//        operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
+        if let sendData = messageManager?.makeCellBodyData(bodyData: bodyData, messageCode: String(format: "%018d", count), messageType: messageType, totalBodyCount: totalBodyCount, index: index) {
             self.clientSocket?.write(sendData, withTimeout: -1, tag: 10086)
-//            return false
-//        }
-//        queue.addOperation(operation)
-    }
-    // 发送消息
-    // TODO: 后期方法, 封装成传参形式, 将文件地址传进来, 然后使用流式读取, 避免一次性读取文件过大, 导致内存暴涨
-    func sendMessage() {
-        
-        //        let string = "Server" + "-\(count)"
-        //        let data = string.data(using: .utf8)  okzxVsJNxXc
-        
-        //        var json: [String: Any] = ["userName": "garenge", "timeStamp": Date().timeIntervalSince1970]
-        //        var fileSize = 0
-        //
-        //            // 由于文件不能完全加载成data, 容易内存爆炸, 所以文件改成流式获取
-        //        if
-        //            let filePath = filePath, FileManager.default.fileExists(atPath: filePath),
-        //            let attributes = try? FileManager.default.attributesOfItem(atPath: filePath),
-        //            let size = attributes[.size] as? NSNumber,
-        //            size.int64Value > 0 {
-        //            fileSize = size.intValue
-        //            json["file"] = ["fileName": "test.txt", "filePath": filePath, "fileSize": fileSize]
-        //        }
-        //
-        //            // json一般都在可控范围, 所以json直接获取data
-        //        guard let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) else {
-        //            return
-        //        }
-        
-        
-        guard let filePath = Bundle.main.path(forResource: "IMG_1555.MOV", ofType: nil) else {
-            print("文件不存在")
-            return
         }
-//        let filePath = "/Users/garenge/Downloads/Jietu20241027-145102-HD.mp4"
-        self.sendFileData(filePath: filePath)
+    }
+    /// 发送消息
+    func sendMessage() {
+        // 模拟多任务队列
+        do {
+            guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
+                print("文件不存在")
+                return
+            }
+            self.sendFileData(filePath: filePath)
+        }
+        
+        do {
+            guard let filePath = Bundle.main.path(forResource: "故障.txt", ofType: nil) else {
+                print("文件不存在")
+                return
+            }
+            self.sendFileData(filePath: filePath)
+        }
     }
 }
 
@@ -146,7 +137,6 @@ extension Server: GCDAsyncSocketDelegate {
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
         print("Server 已发送消息, tag:\(tag)")
-//        (self.queue.operations.first as? PPCustomAsyncOperation)?.finish()
         self.sendBodyMessage()
     }
 }

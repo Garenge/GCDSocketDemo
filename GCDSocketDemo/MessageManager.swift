@@ -120,11 +120,11 @@ class MessageManager: NSObject {
         try? readFileHandle?.seek(toOffset: readedOffset)
         
         cellMessageBlock?(bodyData, bodyTotalCount, bodyCurrentIndex)
-        if (hasAllMessageDone) {
-            finishedAllTask?()
-            try? readFileHandle?.close()
-        }
         bodyCurrentIndex += 1
+        if (hasAllMessageDone) {
+            try? readFileHandle?.close()
+            finishedAllTask?()
+        }   
     }
     
     func makeCellBodyData(bodyData: Data, messageCode: String, messageType: MessageType, totalBodyCount: Int, index: Int) -> Data {
