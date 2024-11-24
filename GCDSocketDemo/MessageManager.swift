@@ -19,19 +19,20 @@ class MessageManager: NSObject {
     
     // 8个长度, 分包, 包的个数 // 一个包, 最大 maxBodyLength, 其中还有开头的 20+8+8
     // 8个长度, 分包, 包的序号
-    // 8个长度, 转换成字符串, 表示接下来的数据长度
+    // 8个长度 这个包有多长
+    // 16个长度, 转换成字符串, 表示接下来的数据长度
     // 数据
     static let maxBodyLength = 12 * 1024
     
     static func makeJsonBodyData(data: Data, cellMessageBlock:((_ bodyData: Data, _ totalBodyCount: Int, _ index: Int) -> ())?) {
-        // 18 + 2 + 8 + 8 (固定开头)  8  data
-        // 所有的数据分包, 每个包由于有固定的开头20+8+8个字节, 所以每个包最多放maxBodyLength - 20 - 8 - 8个长度
-        let preFixLength = 20 + 8 + 8
-        // 整理整个数据, 发现前面数据基本都是可控的, 整块数据可以分成两段, 8 + data
+        // 18 + 2 + 8 + 8 + 8 (固定开头)  8  data
+        // 所有的数据分包, 每个包由于有固定的开头20+8+8+8个字节, 所以每个包最多放maxBodyLength - 20 - 8 - 8 - 8个长度
+        let preFixLength = 20 + 8 + 8 + 8
+        // 整理整个数据, 发现前面数据基本都是可控的, 整块数据可以分成两段, 16 + data
         let preData = { () -> Data in
             var bodyData = Data()
-            //8个长度, 转换成字符串, 表示接下来的json长度
-            let length = String(format: "%08d", data.count)
+            //16个长度, 转换成字符串, 表示接下来的json长度
+            let length = String(format: "%016d", data.count)
             bodyData.append(length.data(using: .utf8)!)
             //数据体
             bodyData.append(data)
@@ -60,7 +61,7 @@ class MessageManager: NSObject {
     }
     
     static func makeFileBodyData(filePath: String, cellMessageBlock:((_ bodyData: Data, _ totalBodyCount: Int, _ index: Int) -> ())?, failureBlock:((_ msg: String) -> ())?) {
-        let preFixLength = 20 + 8 + 8
+        let preFixLength = 20 + 8 + 8 + 8
         
         var fileSize = 0
         
@@ -77,17 +78,17 @@ class MessageManager: NSObject {
             return
         }
         
-        // 18 + 2 + 8 + 8 (固定开头)  8  data
-        // 所有的数据分包, 每个包由于有固定的开头20+8+8个字节, 所以每个包最多放maxBodyLength - 20 - 8 - 8个长度
-        let totalBodySize = 8 + fileSize
+        // 18 + 2 + 8 + 8 + 8 (固定开头)  16  data
+        // 所有的数据分包, 每个包由于有固定的开头20+8+8 + 8个字节, 所以每个包最多放maxBodyLength - 20 - 8 - 8 - 8个长度
+        let totalBodySize = 16 + fileSize
         let cellBodyLength = maxBodyLength - preFixLength
         let totalBodyCount = (totalBodySize + cellBodyLength - 1) / cellBodyLength
 
-        // 整理整个数据, 发现前面数据基本都是可控的, 整块数据可以分成两段, (20 8 8   8  json  8)  fileData
+        // 整理整个数据, 发现前面数据基本都是可控的, 整块数据可以分成两段, 20 + 8 + 8 + 8    16 + fileData
         let preData = { () -> Data in
             var bodyData = Data()
-            //8个长度, 转换成字符串, 表示接下来的data长度
-            let fileLength = String(format: "%08d", fileSize)
+            //16个长度, 转换成字符串, 表示接下来的data长度
+            let fileLength = String(format: "%016d", fileSize)
             bodyData.append(fileLength.data(using: .utf8)!)
             return bodyData
         }()
@@ -150,7 +151,7 @@ class MessageManager: NSObject {
     static func makeCellBodyData(bodyData: Data, messageCode: String, messageType: MessageType, totalBodyCount: Int, index: Int) -> Data {
         var sendData = Data()
         
-        //20个长度, 区分分包数据
+        //18个长度, 区分分包数据
         let oneKey = messageCode.count == 18 ? messageCode :  "\(String(format: "%0\(18 - messageCode.count)d", 0))\(messageCode)"
         sendData.append(oneKey.data(using: .utf8)!)
         
@@ -164,9 +165,14 @@ class MessageManager: NSObject {
         //8个长度, 包的序号
         let bodyIndex = String(format: "%08lld", index)
         sendData.append(bodyIndex.data(using: .utf8)!)
+        // 8个长度 这个包有多长
+        let bodyLength = String(format: "%08lld", bodyData.count + 20 + 8 + 8 + 8)
+        sendData.append(bodyLength.data(using: .utf8)!)
         
-        print("0数据共\(totalBodyCount)包, 当前第\(index)包, 此包大小: \(bodyData.count)")
         sendData.append(bodyData)
+        
+        print("0数据共\(totalBodyCount)包, 当前第\(index)包, 此包实际数据大小: \(bodyData.count)")
+        print("0数据共\(totalBodyCount)包, 当前第\(index)包, 此包发送体大小: \(sendData.count)")
         
         return sendData
     }

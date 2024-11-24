@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		81C996EF1F8FAD39E278D471 /* Pods_GCDSocketDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */; };
 		9D0675712CF23C1600C4E797 /* 故障.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9D0675702CF23C1600C4E797 /* 故障.txt */; };
+		9D0675742CF251FA00C4E797 /* IMG_1555_2.mov in Resources */ = {isa = PBXBuildFile; fileRef = 9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */; };
 		9D0B6D9B2CEF6FD600FA009F /* MessageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0B6D9A2CEF6FD600FA009F /* MessageManager.swift */; };
 		9D0FA6F02A1488830091D0E7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */; };
 		9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */; };
@@ -26,6 +27,8 @@
 /* Begin PBXFileReference section */
 		3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GCDSocketDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0675702CF23C1600C4E797 /* 故障.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "故障.txt"; sourceTree = "<group>"; };
+		9D0675722CF24F8800C4E797 /* GCDSocketDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GCDSocketDemo.entitlements; sourceTree = "<group>"; };
+		9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_1555_2.mov; sourceTree = "<group>"; };
 		9D0B6D9A2CEF6FD600FA009F /* MessageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageManager.swift; sourceTree = "<group>"; };
 		9D0FA6EC2A1488830091D0E7 /* GCDSocketDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GCDSocketDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -95,10 +98,12 @@
 		9D0FA6EE2A1488830091D0E7 /* GCDSocketDemo */ = {
 			isa = PBXGroup;
 			children = (
+				9D0675722CF24F8800C4E797 /* GCDSocketDemo.entitlements */,
 				9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */,
 				9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */,
 				9D0FA6F32A1488830091D0E7 /* ViewController.swift */,
 				9D0FA7032A1489F50091D0E7 /* Server.swift */,
+				9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */,
 				9D0FA7052A1489FE0091D0E7 /* Client.swift */,
 				9D8FF4282CEA2AF300896444 /* okzxVsJNxXc.jpg */,
 				9D8FF4262CE9E54B00896444 /* test.txt */,
@@ -177,6 +182,7 @@
 				9D8FF4292CEA2AF300896444 /* okzxVsJNxXc.jpg in Resources */,
 				9D0FA6FC2A1488840091D0E7 /* LaunchScreen.storyboard in Resources */,
 				9D0FA6F92A1488840091D0E7 /* Assets.xcassets in Resources */,
+				9D0675742CF251FA00C4E797 /* IMG_1555_2.mov in Resources */,
 				9D0FA6F72A1488830091D0E7 /* Main.storyboard in Resources */,
 				9D8FF4252CE9DD2300896444 /* test.jpg in Resources */,
 				9D8FF4272CE9E54B00896444 /* test.txt in Resources */,
@@ -384,11 +390,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = GCDSocketDemo/GCDSocketDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = E7W6597ZYH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GCDSocketDemo/Info.plist;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要访问本地网络以监听端口";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -402,6 +410,9 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = lzp.GCDSocketDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/GCDSocketDemo-Brigding-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -415,11 +426,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = GCDSocketDemo/GCDSocketDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = E7W6597ZYH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GCDSocketDemo/Info.plist;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要访问本地网络以监听端口";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -433,6 +446,9 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = lzp.GCDSocketDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/GCDSocketDemo-Brigding-Header.h";
 				SWIFT_VERSION = 5.0;

@@ -68,15 +68,9 @@ extension Server {
     func sendCellBodyData(bodyData: Data, messageType: MessageManager.MessageType, totalBodyCount: Int, index: Int) {
         let sendData = MessageManager.makeCellBodyData(bodyData: bodyData, messageCode: String(format: "%018d", count), messageType: messageType, totalBodyCount: totalBodyCount, index: index)
         
-        // 计算当前包的大小
-        var finalData = Data()
-        let length = String(format: "%08d", sendData.count)
-        finalData.append(length.data(using: .utf8)!)
-        finalData.append(sendData)
-        
         let operation = PPCustomAsyncOperation()
         operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
-            self?.clientSocket?.write(finalData, withTimeout: -1, tag: 10086)
+            self?.clientSocket?.write(sendData, withTimeout: -1, tag: 10086)
             return false
         }
         queue.addOperation(operation)
@@ -107,10 +101,11 @@ extension Server {
         //        }
         
         
-        guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
+        guard let filePath = Bundle.main.path(forResource: "IMG_1555_2.mov", ofType: nil) else {
             print("文件不存在")
             return
         }
+//        let filePath = "/Users/garenge/Downloads/Jietu20241027-145102-HD.mp4"
         self.sendFileData(filePath: filePath)
     }
 }

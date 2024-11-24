@@ -84,10 +84,13 @@ extension Client {
         guard let bodyIndexStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let bodyIndex = Int(bodyIndexStr) else { return }
         parseIndex += 8
         
+        guard let bodyLengthStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let _ = Int(bodyLengthStr) else { return }
+        parseIndex += 8
+        
         if (bodyIndex == 0) {
             // 数据格式是 8 + data, 所以真正的文件, 需要往后移动8个字节
-            guard let bodyLengthStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let bodyLength = Int(bodyLengthStr) else { return }
-            parseIndex += 8
+            guard let totalLengthStr = String(data: data.subdata(in: parseIndex..<parseIndex + 16), encoding: .utf8), let _ = Int(totalLengthStr) else { return }
+            parseIndex += 16
         }
         
         //        print("数据共\(bodyCount)包, 当前第\(bodyIndex)包, 继续等待")
@@ -153,7 +156,8 @@ extension Client: GCDAsyncSocketDelegate {
         //        //20个长度, 事件名称, 无业务意义, 仅用作判断相同消息
         //        //8个长度, 包的个数 // 一个包, 最大 8k = 8 * 1024, 其中还有开头的 20+8+8
         //        //8个长度, 包的序号
-        //        //8个长度, 转换成字符串, 表示接下来的data长度
+        //        // 8个长度, 这个包有多长
+        //        //16个长度, 转换成字符串, 表示接下来的data长度
         //        //二进制流
         //        self.socket.readData(withTimeout: -1, tag: 10086)
         
@@ -161,21 +165,21 @@ extension Client: GCDAsyncSocketDelegate {
         print("Client 已收到消息:")
         receiveBuffer.append(data)
         
-        while receiveBuffer.count >= 8 {
-            // 包头长度为 4 字节
+        let preFixLength = 20 + 8 + 8 + 8
+        while receiveBuffer.count >= preFixLength {
             // 读取包头，解析包体长度
-            let lengthData = receiveBuffer.subdata(in: 0..<8)
+            let lengthData = receiveBuffer.subdata(in: (preFixLength - 8)..<preFixLength)
             let length = Int(String(data: lengthData, encoding: .utf8) ?? "0") ?? 0
             
-            if receiveBuffer.count >= 8 + length {
+            if receiveBuffer.count >= length {
                 // 获取完整包
-                let completePacket = receiveBuffer.subdata(in: 8..<(8 + length))
+                let completePacket = receiveBuffer.subdata(in: 0..<(length))
                 
                 // 处理完整包数据
                 self.didReceiveData(data: completePacket)
                 
                 // 移除已处理的包
-                receiveBuffer.removeSubrange(0..<(8 + length))
+                receiveBuffer.removeSubrange(0..<(length))
             } else {
                 // 数据不完整，等待更多数据
                 break
