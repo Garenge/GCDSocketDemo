@@ -10,11 +10,11 @@ import PPCustomAsyncOperation
 
 class Server: NSObject {
     
-    lazy var queue: PPCustomOperationQueue = {
-        let queue = PPCustomOperationQueue()
-        queue.maxConcurrentOperationCount = 1;
-        return queue
-    }()
+//    lazy var queue: PPCustomOperationQueue = {
+//        let queue = PPCustomOperationQueue()
+//        queue.maxConcurrentOperationCount = 1;
+//        return queue
+//    }()
     
     lazy var socket: GCDAsyncSocket = {
         let socket = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
@@ -41,39 +41,51 @@ class Server: NSObject {
     
     var clientSocket: GCDAsyncSocket?
     
+    /// 标记发送事件, 处理完一个事件, 可以+1
     var count = 0
+    
+    /// 消息管理
+    var messageManager: MessageManager = MessageManager()
 }
 
 extension Server {
     
     func sendJsonData(data: Data) {
-        MessageManager.makeJsonBodyData(data: data) { [weak self] (bodyData, totalBodyCount, index) in
+        messageManager.makeJsonBodyData(data: data) { [weak self] (bodyData, totalBodyCount, index) in
             self?.sendCellBodyData(bodyData: bodyData, messageType: .json, totalBodyCount: totalBodyCount, index: index)
         }
         count += 1
     }
     
     func sendFileData(filePath: String) {
+        if !messageManager.hasAllMessageDone { return }
+        messageManager.hasAllMessageDone = false
+        self.messageManager.readFilePath = filePath
         
-        
-        MessageManager.makeFileBodyData(filePath: filePath) { [weak self] (bodyData, totalBodyCount, index) in
-            self?.sendCellBodyData(bodyData: bodyData, messageType: .file, totalBodyCount: totalBodyCount, index: index)
+        self.sendBodyMessage()
+    }
+    
+    func sendBodyMessage() {
+        messageManager.makeFileBodyData { [weak self] (bodyData, totalBodyCount, index) in
+            if index < totalBodyCount {
+                self?.sendCellBodyData(bodyData: bodyData, messageType: .file, totalBodyCount: totalBodyCount, index: index)
+            }
+        } finishedAllTask: { [weak self] in
+            self?.count += 1
         } failureBlock: { msg in
             print(msg)
         }
-        
-        count += 1
     }
     
     func sendCellBodyData(bodyData: Data, messageType: MessageManager.MessageType, totalBodyCount: Int, index: Int) {
-        let sendData = MessageManager.makeCellBodyData(bodyData: bodyData, messageCode: String(format: "%018d", count), messageType: messageType, totalBodyCount: totalBodyCount, index: index)
+        let sendData = messageManager.makeCellBodyData(bodyData: bodyData, messageCode: String(format: "%018d", count), messageType: messageType, totalBodyCount: totalBodyCount, index: index)
         
-        let operation = PPCustomAsyncOperation()
-        operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
-            self?.clientSocket?.write(sendData, withTimeout: -1, tag: 10086)
-            return false
-        }
-        queue.addOperation(operation)
+//        let operation = PPCustomAsyncOperation()
+//        operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
+            self.clientSocket?.write(sendData, withTimeout: -1, tag: 10086)
+//            return false
+//        }
+//        queue.addOperation(operation)
     }
     // 发送消息
     // TODO: 后期方法, 封装成传参形式, 将文件地址传进来, 然后使用流式读取, 避免一次性读取文件过大, 导致内存暴涨
@@ -101,7 +113,7 @@ extension Server {
         //        }
         
         
-        guard let filePath = Bundle.main.path(forResource: "IMG_1555_2.mov", ofType: nil) else {
+        guard let filePath = Bundle.main.path(forResource: "IMG_1555.MOV", ofType: nil) else {
             print("文件不存在")
             return
         }
@@ -134,6 +146,7 @@ extension Server: GCDAsyncSocketDelegate {
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
         print("Server 已发送消息, tag:\(tag)")
-        (self.queue.operations.first as? PPCustomAsyncOperation)?.finish()
+//        (self.queue.operations.first as? PPCustomAsyncOperation)?.finish()
+        self.sendBodyMessage()
     }
 }

@@ -14,31 +14,57 @@ class MessageManager: NSObject {
         case file = 1
     }
     
+    /// 读取文件的地址, 设置地址之后, 自动读取数据, 准备分包操作
+    var readFilePath: String? {
+        didSet {
+            if let filePath = readFilePath {
+                
+                // 由于文件不能完全加载成data, 容易内存爆炸, 所以文件改成流式获取
+                if FileManager.default.fileExists(atPath: filePath),
+                   let attributes = try? FileManager.default.attributesOfItem(atPath: filePath),
+                   let size = attributes[.size] as? NSNumber,
+                   size.int64Value > 0 {
+                    
+                    readFileHandle = FileHandle(forReadingAtPath: filePath)
+                    
+                    toSendTotalSize = UInt64(size.int64Value)
+                    let cellBodyLength = UInt64(maxBodyLength - prefixLength)
+                    bodyTotalCount = Int((toSendTotalSize + cellBodyLength - 1) / cellBodyLength)
+                } else {
+                    print("文件不存在")
+                }
+            }
+        }
+    }
+    /// 读取文件的句柄, 用于读取文件数据
+    private var readFileHandle: FileHandle?
+    /// 读取文件的偏移量, 用于读取文件数据
+    private var readedOffset: UInt64 = 0
+    /// 消息是否全部处理完成
+    var hasAllMessageDone: Bool = true
+    /// 总的要发送的数据的大小
+    public var toSendTotalSize: UInt64 = 0
+    /// 分包的总包数
+    private var bodyTotalCount = 0
+    /// 当前分包的序号
+    private var bodyCurrentIndex = 0
+    
+    var prefixLength = 20 + 8 + 8 + 8 + 16
+    
     // 18, 事件名称, 无业务意义, 仅用作判断相同消息
     // 2, 数据类型, 00: 默认, json, 01: 文件
-    
-    // 8个长度, 分包, 包的个数 // 一个包, 最大 maxBodyLength, 其中还有开头的 20+8+8
+    // 8个长度, 分包, 包的个数 // 一个包, 放 maxBodyLength - prefixLength
     // 8个长度, 分包, 包的序号
-    // 8个长度 这个包有多长
+    // 8个长度, 分包, 包的长度
     // 16个长度, 转换成字符串, 表示接下来的数据长度
     // 数据
-    static let maxBodyLength = 12 * 1024
+    let maxBodyLength = 12 * 1024
     
-    static func makeJsonBodyData(data: Data, cellMessageBlock:((_ bodyData: Data, _ totalBodyCount: Int, _ index: Int) -> ())?) {
-        // 18 + 2 + 8 + 8 + 8 (固定开头)  8  data
-        // 所有的数据分包, 每个包由于有固定的开头20+8+8+8个字节, 所以每个包最多放maxBodyLength - 20 - 8 - 8 - 8个长度
-        let preFixLength = 20 + 8 + 8 + 8
-        // 整理整个数据, 发现前面数据基本都是可控的, 整块数据可以分成两段, 16 + data
-        let preData = { () -> Data in
-            var bodyData = Data()
-            //16个长度, 转换成字符串, 表示接下来的json长度
-            let length = String(format: "%016d", data.count)
-            bodyData.append(length.data(using: .utf8)!)
-            //数据体
-            bodyData.append(data)
-            return bodyData
-        }()
-        let totalBodySize = preData.count
+    func makeJsonBodyData(data: Data, cellMessageBlock:((_ bodyData: Data, _ totalBodyCount: Int, _ index: Int) -> ())?) {
+        // 18 + 2 + 8 + 8 + 8 + 16 (固定开头)  data
+        // 所有的数据分包, 每个包由于有固定的开头20+8+8+8+16个字节, 所以每个包最多放maxBodyLength - 20 - 8 - 8 - 8 - 16个长度
+        let preFixLength = 20 + 8 + 8 + 8 + 16
+        let totalBodySize = data.count
         let cellBodyLength = maxBodyLength - preFixLength
         let totalBodyCount = (totalBodySize + cellBodyLength - 1) / cellBodyLength
         
@@ -46,13 +72,13 @@ class MessageManager: NSObject {
         var cellBodyIndex = 0
         while sepIndex < totalBodySize {
             var bodyData = Data()
-            if sepIndex + maxBodyLength - preFixLength < preData.count {
+            if sepIndex + maxBodyLength - preFixLength < data.count {
                 // 这一次放心取, 数据量很大
-                bodyData.append(preData.subdata(in: sepIndex..<(sepIndex + maxBodyLength - preFixLength)))
+                bodyData.append(data.subdata(in: sepIndex..<(sepIndex + maxBodyLength - preFixLength)))
                 sepIndex += maxBodyLength - preFixLength
             } else {
-                bodyData.append(preData.subdata(in: sepIndex..<preData.count))
-                sepIndex = preData.count
+                bodyData.append(data.subdata(in: sepIndex..<data.count))
+                sepIndex = data.count
             }
             
             cellMessageBlock?(bodyData, totalBodyCount, cellBodyIndex)
@@ -60,95 +86,48 @@ class MessageManager: NSObject {
         }
     }
     
-    static func makeFileBodyData(filePath: String, cellMessageBlock:((_ bodyData: Data, _ totalBodyCount: Int, _ index: Int) -> ())?, failureBlock:((_ msg: String) -> ())?) {
-        let preFixLength = 20 + 8 + 8 + 8
+    /// 由于文件量大, 需要考虑到内存, 所以我们控制在随需随取
+    func makeFileBodyData(cellMessageBlock:((_ bodyData: Data, _ totalBodyCount: Int, _ index: Int) -> ())?, finishedAllTask: (() -> ())?, failureBlock:((_ msg: String) -> ())?) {
         
-        var fileSize = 0
-        
-        // 由于文件不能完全加载成data, 容易内存爆炸, 所以文件改成流式获取
-        if FileManager.default.fileExists(atPath: filePath),
-           let attributes = try? FileManager.default.attributesOfItem(atPath: filePath),
-           let size = attributes[.size] as? NSNumber,
-           size.int64Value > 0 {
-            fileSize = size.intValue
+        if (nil == readFileHandle) {
+            failureBlock?("文件句柄不存在")
+            return
         }
-        if fileSize == 0 {
-            print("文件不存在")
-            failureBlock?("文件不存在")
+        if readedOffset >= toSendTotalSize {
+            failureBlock?("文件已经读取完了")
             return
         }
         
-        // 18 + 2 + 8 + 8 + 8 (固定开头)  16  data
-        // 所有的数据分包, 每个包由于有固定的开头20+8+8 + 8个字节, 所以每个包最多放maxBodyLength - 20 - 8 - 8 - 8个长度
-        let totalBodySize = 16 + fileSize
-        let cellBodyLength = maxBodyLength - preFixLength
-        let totalBodyCount = (totalBodySize + cellBodyLength - 1) / cellBodyLength
-
-        // 整理整个数据, 发现前面数据基本都是可控的, 整块数据可以分成两段, 20 + 8 + 8 + 8    16 + fileData
-        let preData = { () -> Data in
-            var bodyData = Data()
-            //16个长度, 转换成字符串, 表示接下来的data长度
-            let fileLength = String(format: "%016d", fileSize)
-            bodyData.append(fileLength.data(using: .utf8)!)
-            return bodyData
-        }()
-        // 创建一个下标, 从左往右按顺序截取data, 发送数据
+        let fileReadCount = maxBodyLength - prefixLength
         
-        var sepIndex = 0
-        var cellBodyIndex = 0
-        
-        guard let fileHandler = FileHandle(forReadingAtPath: filePath) else {
-            print("创建文件句柄失败")
-            return
-        }
-        try? fileHandler.seek(toOffset: 0)
-        
-        while sepIndex < totalBodySize {
-            // 从上一个下标开始, 取长度为 maxBodyLength - preFixLength 的流
-            if sepIndex + maxBodyLength - preFixLength < preData.count {
-                // 还没取到file
-                let bodyData = preData.subdata(in: sepIndex..<(sepIndex + maxBodyLength - preFixLength))
-                cellMessageBlock?(bodyData, totalBodyCount, cellBodyIndex)
-                sepIndex += maxBodyLength - preFixLength
-                cellBodyIndex += 1
-            } else {
-                // 右边已经到了file
-                var bodyData = Data()
-                var fileReadCount = 0
-                if sepIndex < preData.count {
-                    // 左脚在前一块, 后脚在data, 先把前一部分给放到bodyData中
-                    bodyData.append(preData.subdata(in: sepIndex..<preData.count))
-                    fileReadCount = maxBodyLength - preFixLength - (preData.count - sepIndex)
-                    sepIndex = preData.count - sepIndex
-                } else {
-                    fileReadCount = maxBodyLength - preFixLength
-                }
-                
-                // fileReadCount表示这一次最多还可以读多少数据
-                if fileReadCount >= totalBodySize - sepIndex {
-                    // 说明这一次可以把文件全取完了
-                    if fileSize > 0 {
-                        let data = fileHandler.readData(ofLength: totalBodySize - sepIndex)
-                        bodyData.append(data)
-                    }
-                    sepIndex = totalBodySize
-                } else {
-                    // 文件只能取一部分
-                    let data = fileHandler.readData(ofLength: fileReadCount)
-                    bodyData.append(data)
-                    try? fileHandler.seek(toOffset: UInt64(sepIndex + fileReadCount - preData.count))
-                    sepIndex += fileReadCount
-                }
-                
-                cellMessageBlock?(bodyData, totalBodyCount, cellBodyIndex)
-                cellBodyIndex += 1
+        var bodyData = Data()
+        // fileReadCount表示这一次最多还可以读多少数据
+        if fileReadCount >= toSendTotalSize - readedOffset {
+            // 说明这一次可以把文件全取完了
+            if toSendTotalSize > 0, let data = readFileHandle?.readData(ofLength: Int(toSendTotalSize - readedOffset)) {
+                bodyData.append(data)
+                readedOffset = toSendTotalSize
+                readFileHandle?.closeFile()
+                hasAllMessageDone = true
             }
-            
+        } else {
+            // 文件只能取一部分
+            if let data = readFileHandle?.readData(ofLength: fileReadCount) {
+                bodyData.append(data)
+                readedOffset += UInt64(fileReadCount)
+            }
         }
-        fileHandler.closeFile()
+        try? readFileHandle?.seek(toOffset: readedOffset)
+        
+        cellMessageBlock?(bodyData, bodyTotalCount, bodyCurrentIndex)
+        if (hasAllMessageDone) {
+            finishedAllTask?()
+            try? readFileHandle?.close()
+        }
+        bodyCurrentIndex += 1
     }
     
-    static func makeCellBodyData(bodyData: Data, messageCode: String, messageType: MessageType, totalBodyCount: Int, index: Int) -> Data {
+    func makeCellBodyData(bodyData: Data, messageCode: String, messageType: MessageType, totalBodyCount: Int, index: Int) -> Data {
         var sendData = Data()
         
         //18个长度, 区分分包数据
@@ -159,15 +138,18 @@ class MessageManager: NSObject {
         let type = String(format: "%02d", messageType.rawValue)
         sendData.append(type.data(using: .utf8)!)
         
-        //8个长度, 包的个数 // 一个包, 最大 8k = 8 * 1024, 其中还有开头的 2+8+8
+        //8个长度, 包的个数
         let bodyCount = String(format: "%08lld", totalBodyCount)
         sendData.append(bodyCount.data(using: .utf8)!)
         //8个长度, 包的序号
         let bodyIndex = String(format: "%08lld", index)
         sendData.append(bodyIndex.data(using: .utf8)!)
         // 8个长度 这个包有多长
-        let bodyLength = String(format: "%08lld", bodyData.count + 20 + 8 + 8 + 8)
+        let bodyLength = String(format: "%08lld", bodyData.count + prefixLength)
         sendData.append(bodyLength.data(using: .utf8)!)
+        
+        let totalLength = String(format: "%016lld", toSendTotalSize)
+        sendData.append(totalLength.data(using: .utf8)!)
         
         sendData.append(bodyData)
         
