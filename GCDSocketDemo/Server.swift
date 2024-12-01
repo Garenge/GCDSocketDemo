@@ -22,11 +22,12 @@ class Server: NSObject {
         return socket
     }()
     
-    func accept() {
+    func accept(port: UInt16 = 12123) {
         do {
-            try socket.accept(onPort: 12123)
+            try socket.accept(onPort: port)
+            print("Server 监听端口 \(port) 成功")
         } catch {
-            print("Server 监听端口 12123 失败: \(error)")
+            print("Server 监听端口 \(port) 失败: \(error)")
         }
     }
     

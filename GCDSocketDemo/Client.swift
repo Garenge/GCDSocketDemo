@@ -30,13 +30,16 @@ class Client: NSObject {
         return socket
     }()
     
-    func connect() {
+    func connect(host: String = "127.0.0.1", port: UInt16 = 12123) {
         if !self.socket.isConnected {
             do {
-                try self.socket.connect(toHost: "127.0.0.1", onPort: 12123, withTimeout: -1)
+                try self.socket.connect(toHost: host, onPort: port, withTimeout: -1)
+                print("Client: \(host):\(port) 开始连接")
             } catch {
-                print("Client connect to socket error: \(error)")
+                print("Client connect to socket: \(host):\(port) error: \(error)")
             }
+        } else {
+            print("Client: \(host):\(port) 已连接, 无需重复连接")
         }
     }
     
