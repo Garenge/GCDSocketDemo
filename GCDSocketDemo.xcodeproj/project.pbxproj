@@ -8,17 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		81C996EF1F8FAD39E278D471 /* Pods_GCDSocketDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */; };
+		9D03F12E2CFC7AA900AE4BA0 /* SocketBaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F12D2CFC7AA900AE4BA0 /* SocketBaseManager.swift */; };
+		9D03F1302CFCA1A500AE4BA0 /* ReceiveMessageTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */; };
 		9D0675712CF23C1600C4E797 /* 故障.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9D0675702CF23C1600C4E797 /* 故障.txt */; };
 		9D0675742CF251FA00C4E797 /* IMG_1555_2.mov in Resources */ = {isa = PBXBuildFile; fileRef = 9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */; };
-		9D0B6D9B2CEF6FD600FA009F /* MessageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0B6D9A2CEF6FD600FA009F /* MessageManager.swift */; };
+		9D0B6D9B2CEF6FD600FA009F /* SendMessageTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */; };
 		9D0FA6F02A1488830091D0E7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */; };
 		9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */; };
 		9D0FA6F42A1488830091D0E7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F32A1488830091D0E7 /* ViewController.swift */; };
 		9D0FA6F72A1488830091D0E7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F52A1488830091D0E7 /* Main.storyboard */; };
 		9D0FA6F92A1488840091D0E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F82A1488840091D0E7 /* Assets.xcassets */; };
 		9D0FA6FC2A1488840091D0E7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6FA2A1488840091D0E7 /* LaunchScreen.storyboard */; };
-		9D0FA7042A1489F50091D0E7 /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7032A1489F50091D0E7 /* Server.swift */; };
-		9D0FA7062A1489FE0091D0E7 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7052A1489FE0091D0E7 /* Client.swift */; };
+		9D0FA7042A1489F50091D0E7 /* ServerSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */; };
+		9D0FA7062A1489FE0091D0E7 /* ClientSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */; };
 		9D8FF4252CE9DD2300896444 /* test.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 9D8FF4242CE9DD2300896444 /* test.jpg */; };
 		9D8FF4272CE9E54B00896444 /* test.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9D8FF4262CE9E54B00896444 /* test.txt */; };
 		9D8FF4292CEA2AF300896444 /* okzxVsJNxXc.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 9D8FF4282CEA2AF300896444 /* okzxVsJNxXc.jpg */; };
@@ -26,10 +28,12 @@
 
 /* Begin PBXFileReference section */
 		3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GCDSocketDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D03F12D2CFC7AA900AE4BA0 /* SocketBaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketBaseManager.swift; sourceTree = "<group>"; };
+		9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveMessageTask.swift; sourceTree = "<group>"; };
 		9D0675702CF23C1600C4E797 /* 故障.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "故障.txt"; sourceTree = "<group>"; };
 		9D0675722CF24F8800C4E797 /* GCDSocketDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GCDSocketDemo.entitlements; sourceTree = "<group>"; };
 		9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_1555_2.mov; sourceTree = "<group>"; };
-		9D0B6D9A2CEF6FD600FA009F /* MessageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageManager.swift; sourceTree = "<group>"; };
+		9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMessageTask.swift; sourceTree = "<group>"; };
 		9D0FA6EC2A1488830091D0E7 /* GCDSocketDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GCDSocketDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -38,8 +42,8 @@
 		9D0FA6F82A1488840091D0E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9D0FA6FB2A1488840091D0E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9D0FA6FD2A1488840091D0E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9D0FA7032A1489F50091D0E7 /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
-		9D0FA7052A1489FE0091D0E7 /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSocketManager.swift; sourceTree = "<group>"; };
+		9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientSocketManager.swift; sourceTree = "<group>"; };
 		9D0FA70B2A1495950091D0E7 /* GCDSocketDemo-Brigding-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GCDSocketDemo-Brigding-Header.h"; sourceTree = "<group>"; };
 		9D8FF4242CE9DD2300896444 /* test.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test.jpg; sourceTree = "<group>"; };
 		9D8FF4262CE9E54B00896444 /* test.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
@@ -77,6 +81,18 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		9D03F12C2CFC7A8000AE4BA0 /* Socket */ = {
+			isa = PBXGroup;
+			children = (
+				9D03F12D2CFC7AA900AE4BA0 /* SocketBaseManager.swift */,
+				9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */,
+				9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */,
+				9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */,
+				9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */,
+			);
+			path = Socket;
+			sourceTree = "<group>";
+		};
 		9D0FA6E32A1488830091D0E7 = {
 			isa = PBXGroup;
 			children = (
@@ -98,14 +114,12 @@
 		9D0FA6EE2A1488830091D0E7 /* GCDSocketDemo */ = {
 			isa = PBXGroup;
 			children = (
+				9D03F12C2CFC7A8000AE4BA0 /* Socket */,
 				9D0675722CF24F8800C4E797 /* GCDSocketDemo.entitlements */,
 				9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */,
 				9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */,
 				9D0FA6F32A1488830091D0E7 /* ViewController.swift */,
-				9D0FA7032A1489F50091D0E7 /* Server.swift */,
 				9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */,
-				9D0FA7052A1489FE0091D0E7 /* Client.swift */,
-				9D0B6D9A2CEF6FD600FA009F /* MessageManager.swift */,
 				9D8FF4282CEA2AF300896444 /* okzxVsJNxXc.jpg */,
 				9D8FF4262CE9E54B00896444 /* test.txt */,
 				9D0675702CF23C1600C4E797 /* 故障.txt */,
@@ -239,12 +253,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D03F12E2CFC7AA900AE4BA0 /* SocketBaseManager.swift in Sources */,
 				9D0FA6F42A1488830091D0E7 /* ViewController.swift in Sources */,
 				9D0FA6F02A1488830091D0E7 /* AppDelegate.swift in Sources */,
-				9D0FA7042A1489F50091D0E7 /* Server.swift in Sources */,
-				9D0B6D9B2CEF6FD600FA009F /* MessageManager.swift in Sources */,
+				9D0FA7042A1489F50091D0E7 /* ServerSocketManager.swift in Sources */,
+				9D0B6D9B2CEF6FD600FA009F /* SendMessageTask.swift in Sources */,
 				9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */,
-				9D0FA7062A1489FE0091D0E7 /* Client.swift in Sources */,
+				9D03F1302CFCA1A500AE4BA0 /* ReceiveMessageTask.swift in Sources */,
+				9D0FA7062A1489FE0091D0E7 /* ClientSocketManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

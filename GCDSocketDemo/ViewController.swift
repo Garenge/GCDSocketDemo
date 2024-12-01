@@ -36,16 +36,18 @@ class ViewController: UIViewController {
         self.serverHostTF.text = UserDefaults.standard.string(forKey: GSHostKey)
     }
 
-    let server = Server()
-    let client = Client()
+    let server = ServerSocketManager()
+    let client = ClientSocketManager()
     
     @IBAction func startServer(_ sender: Any) {
+        self.view.endEditing(true)
         server.accept(port: UInt16(serverPort) ?? 12123)
         UserDefaults.standard.set(serverPort, forKey: GSPortKey)
         UserDefaults.standard.synchronize()
     }
     
     @IBAction func clientConnectServer(_ sender: Any) {
+        self.view.endEditing(true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.client.connect(host: self.serverHost, port: UInt16(self.serverPort) ?? 12123)
             UserDefaults.standard.set(self.serverHost, forKey: self.GSHostKey)
