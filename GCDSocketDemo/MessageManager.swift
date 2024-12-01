@@ -33,6 +33,8 @@ class MessageManager: NSObject {
                 } else {
                     print("文件不存在")
                 }
+                
+                self.initialSpeedTimer()
             }
         }
     }
@@ -48,6 +50,37 @@ class MessageManager: NSObject {
     private var bodyTotalCount = 0
     /// 当前分包的序号
     private var bodyCurrentIndex = 0
+    
+    /// 网速回调
+    public var transSpeedChangedBlock: ((_ speed: Double) -> ())?
+    /// 网速
+    public var transSpeed: Double = 0 {
+        didSet {
+            print("当前网速: \(transSpeed)B/s")
+            transSpeedChangedBlock?(transSpeed)
+        }
+    }
+    /// 任务持续时间
+    private var taskOnTimeInterval: TimeInterval = 1
+    /// 计算网速
+    private var speedTimer: Timer?
+    private func initialSpeedTimer() {
+        speedTimer?.invalidate()
+        speedTimer = Timer(timeInterval: 1, repeats: true, block: {[weak self] _ in
+            self?.taskOnTimeInterval += 1
+        })
+        RunLoop.current.add(speedTimer!, forMode: .common)
+    }
+    
+    private func calculateSpeed() {
+        let speed = Double(min(self.readedOffset, toSendTotalSize)) / Double(self.taskOnTimeInterval)
+        self.transSpeed = speed
+    }
+    
+    public func finishTask() {
+        self.calculateSpeed()
+        speedTimer?.invalidate()
+    }
     
     var prefixLength = 20 + 8 + 8 + 8 + 16
     
@@ -158,5 +191,4 @@ class MessageManager: NSObject {
         
         return sendData
     }
-    
 }

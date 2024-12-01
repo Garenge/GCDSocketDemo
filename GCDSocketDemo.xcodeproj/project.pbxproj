@@ -105,6 +105,7 @@
 				9D0FA7032A1489F50091D0E7 /* Server.swift */,
 				9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */,
 				9D0FA7052A1489FE0091D0E7 /* Client.swift */,
+				9D0B6D9A2CEF6FD600FA009F /* MessageManager.swift */,
 				9D8FF4282CEA2AF300896444 /* okzxVsJNxXc.jpg */,
 				9D8FF4262CE9E54B00896444 /* test.txt */,
 				9D0675702CF23C1600C4E797 /* 故障.txt */,
@@ -114,7 +115,6 @@
 				9D0FA6FA2A1488840091D0E7 /* LaunchScreen.storyboard */,
 				9D0FA70B2A1495950091D0E7 /* GCDSocketDemo-Brigding-Header.h */,
 				9D0FA6FD2A1488840091D0E7 /* Info.plist */,
-				9D0B6D9A2CEF6FD600FA009F /* MessageManager.swift */,
 			);
 			path = GCDSocketDemo;
 			sourceTree = "<group>";

@@ -80,6 +80,7 @@ extension Server {
             
             /// 上个任务结束
             self?.count += 1
+            self?.messageManager?.finishTask()
             self?.messageManager = nil
             (self?.queue.operations.first as? PPCustomAsyncOperation)?.finish()
         } failureBlock: { msg in
