@@ -1,4 +1,5 @@
 ${PODS_ROOT}/Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo-frameworks.sh
 ${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework
+${BUILT_PRODUCTS_DIR}/PPCatalystTool/PPCatalystTool.framework
 ${BUILT_PRODUCTS_DIR}/PPCustomAsyncOperation/PPCustomAsyncOperation.framework
 ${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework
