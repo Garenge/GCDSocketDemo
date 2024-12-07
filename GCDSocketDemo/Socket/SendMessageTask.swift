@@ -123,14 +123,14 @@ class SendMessageTask: NSObject {
     // 数据
     let maxBodyLength = 12 * 1024
     
-    func createJsonBodyData(cellMessageBlock:((_ bodyData: Data, _ totalBodyCount: Int, _ index: Int) -> ())?, finishedAllTask: (() -> ())?, failureBlock:((_ msg: String) -> ())?) {
+    func createJsonBodyData(cellMessageBlock:((_ bodyData: Data, _ totalBodyCount: Int, _ index: Int) -> ())?, finishedAllTask: ((_ isSuccess: Bool, _ msg: String?) -> ())?) {
         
         guard let toSendDirectionData = toSendDirectionData else {
-            failureBlock?("数据不存在")
+            finishedAllTask?(false, "数据不存在")
             return
         }
         if readedOffset >= toSendTotalSize {
-            failureBlock?("数据已经读取完了")
+            finishedAllTask?(false, "数据已经读取完了")
             return
         }
         
@@ -155,7 +155,7 @@ class SendMessageTask: NSObject {
         toSendBodyCurrentIndex += 1
         if (hasAllMessageDone) {
             calculateSendSpeed()
-            finishedAllTask?()
+            finishedAllTask?(true, nil)
             finishSendTask()
         }
     }

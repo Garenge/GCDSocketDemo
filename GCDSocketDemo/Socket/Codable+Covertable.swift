@@ -31,4 +31,30 @@ extension Convertable {
 
         return var_dict
     }
+    
+    func convertToJsonData() -> Data? {
+        do {
+            let encoder = JSONEncoder()
+            return try encoder.encode(self)
+        } catch {
+            print(error)
+        }
+        return nil
+    }
+}
+
+extension Array where Element: Convertable {
+    func convertToDictArray() -> [[String: Any]]? {
+        return self.compactMap { $0.convertToDict() }
+    }
+    
+    func convertToJsonData() -> Data? {
+        do {
+            let encoder = JSONEncoder()
+            return try encoder.encode(self)
+        } catch {
+            print(error)
+        }
+        return nil
+    }
 }

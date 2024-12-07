@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import PPCatalystTool
 
 class ViewController: UIViewController {
     
@@ -15,6 +16,8 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var serverPortTF: UITextField!
     @IBOutlet weak var serverHostTF: UITextField!
+    @IBOutlet weak var selectFileView: UIView!
+    @IBOutlet weak var filePathTF: UITextField!
     
     var serverPort: String {
         if let port = self.serverPortTF.text, port.count > 0 {
@@ -34,6 +37,10 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         self.serverPortTF.text = UserDefaults.standard.string(forKey: GSPortKey)
         self.serverHostTF.text = UserDefaults.standard.string(forKey: GSHostKey)
+        
+#if targetEnvironment(macCatalyst)
+        self.selectFileView.isHidden = false
+#endif
     }
 
     let server = ServerSocketManager()
@@ -56,12 +63,28 @@ class ViewController: UIViewController {
     }
 
     @IBAction func send1Action(_ sender: Any) {
-        server.sendMessage()
+        server.sendTestMessage()
     }
 
     @IBAction func send2Action(_ sender: Any) {
-        client.sendMessage()
+        client.sendTestMessage()
     }
 
+    @IBAction func doSendFileAction(_ sender: Any) {
+        guard let filePath = self.filePathTF.text, filePath.count > 0 else {
+            return
+        }
+        server.sendFileInfo(filePath: filePath)
+    }
 }
 
+extension ViewController: UITextFieldDelegate {
+    
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        
+        let result = PPCatalystHandle.shared().selectSingleFile(withFolderPath: "~/Desktop")
+        textField.text = result?.path
+
+        return false
+    }
+}

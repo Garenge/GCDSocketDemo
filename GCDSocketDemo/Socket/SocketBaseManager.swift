@@ -6,12 +6,79 @@
 //
 
 import UIKit
+import CryptoKit
 import PPCustomAsyncOperation
+
+extension String {
+    static func GenerateRandomString(length: Int = 18) -> String {
+        // 1. 创建种子数据（时间戳 + 随机数）
+        let timestamp = Date().timeIntervalSince1970
+        let randomValue = UUID().uuidString
+        let seed = "\(timestamp)\(randomValue)"
+        
+        // 2. 使用 SHA256 生成哈希
+        let hash = SHA256.hash(data: Data(seed.utf8))
+        
+        // 3. 将哈希值转为十六进制字符串
+        let hexString = hash.compactMap { String(format: "%02x", $0) }.joined()
+        
+        // 4. 截取前18位
+        let uniqueID = String(hexString.prefix(length))
+        return uniqueID
+    }
+}
+
+
+struct FileModel: Codable, Convertable {
+    var fileName: String?
+    var filePath: String? {
+        didSet {
+            if let path = filePath {
+                let url = URL(fileURLWithPath: path)
+                do {
+                    let attr = try FileManager.default.attributesOfItem(atPath: url.path)
+                    fileName = url.lastPathComponent
+                    fileSize = attr[FileAttributeKey.size] as? UInt64 ?? 0
+                    pathExtension = url.pathExtension
+                } catch {
+                    print("获取文件信息失败: \(error)")
+                }
+            }
+        }
+    }
+    var fileSize: UInt64 = 0
+    var pathExtension: String?
+    /// 此文件, 会对应一个本地的唯一key, 到时候client请求下载, server将key作为事件名称
+    var fileKey: String = String.GenerateRandomString()
+}
+
+struct SocketMessageFormat: Codable, Convertable {
+    var action: String?
+    var content: String?
+    var messageKey: String = String.GenerateRandomString()
+    
+    static func format(action: GSActions, content: String?) -> SocketMessageFormat {
+        var format = SocketMessageFormat()
+        format.action = action.getActionString()
+        format.content = content
+        return format
+    }
+    
+    static func format(from: Data?) -> SocketMessageFormat? {
+        if let data = from {
+            let decoder = JSONDecoder()
+            if let model = try? decoder.decode(SocketMessageFormat.self, from: data) {
+                return model
+            }
+        }
+        return nil
+    }
+}
 
 class SocketBaseManager: NSObject {
     
-    /// 标记当前任务的序号, 可以理解为唯一标识, 处理完一个事件, 可以+1
-    var sendMessageIndex = 0
+    /// 标记当前任务的序号, 可以理解为唯一标识, 处理完一个事件, 需要重置
+    var sendMessageIndex = String.GenerateRandomString(length: 18)
     /// 18, 事件名称, 无业务意义, 仅用作判断相同消息
     /// 2, 数据类型, 00: 默认, json, 01: 文件
     /// 8个长度, 分包, 包的个数 // 一个包, 放 maxBodyLength - prefixLength
@@ -31,14 +98,14 @@ class SocketBaseManager: NSObject {
         return queue
     }()
     
-    /// 直接发送数据, 直传
-    func sendDirectionData(socket: GCDAsyncSocket?, data: Data) {
+    /// 直接发送数据, 直传(尽量文件不用直传, 采用文件专门的传输, 或者文件传输的时候, key用文件自己的key)
+    func sendDirectionData(socket: GCDAsyncSocket?, data: Data?) {
         let operation = PPCustomAsyncOperation()
         operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
             self?.currentSendMessageTask = SendMessageTask()
             self?.currentSendMessageTask?.hasAllMessageDone = false
             self?.currentSendMessageTask?.messageType = .directionData
-            self?.currentSendMessageTask?.toSendDirectionData = data
+            self?.currentSendMessageTask?.toSendDirectionData = data ?? Data()
             self?.sendBodyMessage(socket: socket)
             return false
         }
@@ -66,13 +133,11 @@ class SocketBaseManager: NSObject {
         case .directionData:
             self.currentSendMessageTask?.createJsonBodyData(cellMessageBlock: { [weak self] (bodyData, totalBodyCount, index) in
                 self?.sendCellBodyData(socket: socket, bodyData: bodyData, messageType: .directionData, totalBodyCount: totalBodyCount, index: index)
-            }, finishedAllTask: { [weak self] in
+            }, finishedAllTask: { [weak self] (isSuccess, msg) in
                 /// 上个任务结束
-                self?.sendMessageIndex += 1
+                self?.sendMessageIndex = String.GenerateRandomString(length: 18)
                 self?.currentSendMessageTask = nil
                 (self?.sendMessageQueue.operations.first as? PPCustomAsyncOperation)?.finish()
-            }, failureBlock: { msg in
-                print(msg)
             })
         case .fileData:
             self.currentSendMessageTask?.createSendFileBodyData { [weak self] (bodyData, totalBodyCount, index) in
@@ -82,7 +147,7 @@ class SocketBaseManager: NSObject {
             } finishedAllTask: { [weak self] in
                 
                 /// 上个任务结束
-                self?.sendMessageIndex += 1
+                self?.sendMessageIndex = String.GenerateRandomString(length: 18)
                 self?.currentSendMessageTask = nil
                 (self?.sendMessageQueue.operations.first as? PPCustomAsyncOperation)?.finish()
             } failureBlock: { msg in
@@ -113,6 +178,13 @@ class SocketBaseManager: NSObject {
         return docuPath
     }
     
+    func receiveRequestFileList(_ messageFormat: SocketMessageFormat) {
+        
+    }
+    
+    func receiveResponseFileList(_ messageFormat: SocketMessageFormat) {
+        
+    }
     
     func didReceiveData(data: Data) {
         if (data.count < prefixLength) {
@@ -215,14 +287,23 @@ class SocketBaseManager: NSObject {
         
         if (messageBody.bodyCount == messageBody.bodyIndex + 1) {
             print("数据所有包都合并完成")
-            self.receivedMessageDic[messageKey] = nil
             
-            if let json = try? JSONSerialization.jsonObject(with: messageBody.directionData!, options: .mutableContainers) {
-                print("收到数据: \(json)")
+            if let messageFormat = SocketMessageFormat.format(from: messageBody.directionData!) {
+                switch messageFormat.action {
+                case GSActions.requestFileList.getActionString():
+                    self.receiveRequestFileList(messageFormat)
+                    break
+                case GSActions.responseFileList.getActionString():
+                    self.receiveResponseFileList(messageFormat)
+                    break
+                default:
+                    break
+                }
             } else {
+                
                 // 可能是文件, 写入文件试试
                 // TODO: 理论上, 客户端先请求文件, 然后服务端开始发送文件, 所以客户端是知道文件格式的, 这里可以根据文件格式来确定文件后缀名
-                let fileName = messageKey + ".jpg"
+                let fileName = messageKey + ".data"
                 let filePath = getDocumentDirectory() + "/" + fileName
                 print("文件地址: \(filePath)")
                 try? FileManager.default.removeItem(atPath: filePath)
@@ -231,6 +312,8 @@ class SocketBaseManager: NSObject {
                 }
                 try? messageBody.directionData?.write(to: URL(fileURLWithPath: filePath))
             }
+            
+            self.receivedMessageDic[messageKey] = nil
             
         } else {
             print("数据所有包未合并完成, 共\(messageBody.bodyCount)包, 当前第\(messageBody.bodyIndex)包, 继续等待")

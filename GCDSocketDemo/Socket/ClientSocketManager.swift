@@ -26,27 +26,40 @@ class ClientSocketManager: SocketBaseManager {
             print("Client: \(host):\(port) 已连接, 无需重复连接")
         }
     }
+    
+    override func receiveResponseFileList(_ messageFormat: SocketMessageFormat) {
+        print("Client 收到文件列表响应")
+        print(messageFormat)
+    }
+    
 }
 
 extension ClientSocketManager {
     
     /// 发送消息
-    func sendMessage() {
-        // 模拟多任务队列
-        do {
-            // 构造一个json
-            let json = ["name": "Client", "age": 18] as [String : Any]
-            if let data = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-                self.sendDirectionData(socket: self.socket, data: data)
-            }
-        }
-        do {
-            guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
-                print("文件不存在")
-                return
-            }
-            self.sendFileData(socket: self.socket, filePath: filePath)
-        }
+    func sendTestMessage() {
+//        // 模拟多任务队列
+//        do {
+//            // 构造一个json
+//            let json = ["name": "Client", "age": 18] as [String : Any]
+//            if let data = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+//                self.sendDirectionData(socket: self.socket, data: data)
+//            }
+//        }
+//        do {
+//            guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
+//                print("文件不存在")
+//                return
+//            }
+//            self.sendFileData(socket: self.socket, filePath: filePath)
+//        }
+        self.sendQueryFileList()
+    }
+    
+    /// 获取文件列表
+    func sendQueryFileList() {
+        let format = SocketMessageFormat.format(action: .requestFileList, content: nil)
+        self.sendDirectionData(socket: self.socket, data: format.convertToJsonData())
     }
 }
 

@@ -1,14 +1,18 @@
 PODS:
   - CocoaAsyncSocket (7.6.5)
+  - PPCatalystTool (1.0.5)
   - PPCustomAsyncOperation (0.1.1)
   - SnapKit (5.6.0)
 
 DEPENDENCIES:
   - CocoaAsyncSocket
+  - PPCatalystTool
   - PPCustomAsyncOperation
   - SnapKit
 
 SPEC REPOS:
+  https://github.com/Garenge/pengpengSpecs.git:
+    - PPCatalystTool
   trunk:
     - CocoaAsyncSocket
     - PPCustomAsyncOperation
@@ -16,9 +20,10 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
+  PPCatalystTool: 559a8a9d308b93a015e0de477ed7072da4f74b42
   PPCustomAsyncOperation: f452884e64b75ee1aab9322490a5e77394cae9af
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
 
-PODFILE CHECKSUM: c6810769e8f3f4e9013a3a3654491fbfa9a9cdce
+PODFILE CHECKSUM: 8e649e50c399b71fef3d53d63f6547c85a606ea2
 
 COCOAPODS: 1.15.2

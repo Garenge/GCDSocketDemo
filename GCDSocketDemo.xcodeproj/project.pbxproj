@@ -10,8 +10,9 @@
 		81C996EF1F8FAD39E278D471 /* Pods_GCDSocketDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */; };
 		9D03F12E2CFC7AA900AE4BA0 /* SocketBaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F12D2CFC7AA900AE4BA0 /* SocketBaseManager.swift */; };
 		9D03F1302CFCA1A500AE4BA0 /* ReceiveMessageTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */; };
-		9D0675712CF23C1600C4E797 /* 故障.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9D0675702CF23C1600C4E797 /* 故障.txt */; };
-		9D0675742CF251FA00C4E797 /* IMG_1555_2.mov in Resources */ = {isa = PBXBuildFile; fileRef = 9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */; };
+		9D03F1322CFE022500AE4BA0 /* PPCatalystPlugin.bundle in Embed PlugIns */ = {isa = PBXBuildFile; fileRef = 9D03F1312CFE022500AE4BA0 /* PPCatalystPlugin.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9D03F1342CFE023E00AE4BA0 /* PPCatalystPlugin.bundle in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D03F1312CFE022500AE4BA0 /* PPCatalystPlugin.bundle */; };
+		9D03F1372CFE071E00AE4BA0 /* Codable+Covertable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F1362CFE071E00AE4BA0 /* Codable+Covertable.swift */; };
 		9D0B6D9B2CEF6FD600FA009F /* SendMessageTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */; };
 		9D0FA6F02A1488830091D0E7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */; };
 		9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */; };
@@ -21,18 +22,30 @@
 		9D0FA6FC2A1488840091D0E7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6FA2A1488840091D0E7 /* LaunchScreen.storyboard */; };
 		9D0FA7042A1489F50091D0E7 /* ServerSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */; };
 		9D0FA7062A1489FE0091D0E7 /* ClientSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */; };
-		9D8FF4252CE9DD2300896444 /* test.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 9D8FF4242CE9DD2300896444 /* test.jpg */; };
-		9D8FF4272CE9E54B00896444 /* test.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9D8FF4262CE9E54B00896444 /* test.txt */; };
-		9D8FF4292CEA2AF300896444 /* okzxVsJNxXc.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 9D8FF4282CEA2AF300896444 /* okzxVsJNxXc.jpg */; };
+		9D4146A12D008E4C000F83B9 /* GSDefine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D4146A02D008E4C000F83B9 /* GSDefine.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9D03F1332CFE022500AE4BA0 /* Embed PlugIns */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9D03F1322CFE022500AE4BA0 /* PPCatalystPlugin.bundle in Embed PlugIns */,
+			);
+			name = "Embed PlugIns";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GCDSocketDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D03F12D2CFC7AA900AE4BA0 /* SocketBaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketBaseManager.swift; sourceTree = "<group>"; };
 		9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveMessageTask.swift; sourceTree = "<group>"; };
-		9D0675702CF23C1600C4E797 /* 故障.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "故障.txt"; sourceTree = "<group>"; };
+		9D03F1312CFE022500AE4BA0 /* PPCatalystPlugin.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = PPCatalystPlugin.bundle; path = Pods/PPCatalystTool/PPCatalystPlugin/Products/PPCatalystPlugin.bundle; sourceTree = "<group>"; };
+		9D03F1362CFE071E00AE4BA0 /* Codable+Covertable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Codable+Covertable.swift"; sourceTree = "<group>"; };
 		9D0675722CF24F8800C4E797 /* GCDSocketDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GCDSocketDemo.entitlements; sourceTree = "<group>"; };
-		9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = IMG_1555_2.mov; sourceTree = "<group>"; };
 		9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMessageTask.swift; sourceTree = "<group>"; };
 		9D0FA6EC2A1488830091D0E7 /* GCDSocketDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GCDSocketDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -45,9 +58,7 @@
 		9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSocketManager.swift; sourceTree = "<group>"; };
 		9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientSocketManager.swift; sourceTree = "<group>"; };
 		9D0FA70B2A1495950091D0E7 /* GCDSocketDemo-Brigding-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GCDSocketDemo-Brigding-Header.h"; sourceTree = "<group>"; };
-		9D8FF4242CE9DD2300896444 /* test.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test.jpg; sourceTree = "<group>"; };
-		9D8FF4262CE9E54B00896444 /* test.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
-		9D8FF4282CEA2AF300896444 /* okzxVsJNxXc.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = okzxVsJNxXc.jpg; sourceTree = "<group>"; };
+		9D4146A02D008E4C000F83B9 /* GSDefine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GSDefine.swift; path = /Applications/GSDefine.swift; sourceTree = "<absolute>"; };
 		DD03948A9DD25EBA0088A7E6 /* Pods-GCDSocketDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GCDSocketDemo.release.xcconfig"; path = "Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo.release.xcconfig"; sourceTree = "<group>"; };
 		E330B0528B2C627878E6B58C /* Pods-GCDSocketDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GCDSocketDemo.debug.xcconfig"; path = "Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,6 +69,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				81C996EF1F8FAD39E278D471 /* Pods_GCDSocketDemo.framework in Frameworks */,
+				9D03F1342CFE023E00AE4BA0 /* PPCatalystPlugin.bundle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */,
+				9D03F1312CFE022500AE4BA0 /* PPCatalystPlugin.bundle */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -89,6 +102,8 @@
 				9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */,
 				9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */,
 				9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */,
+				9D03F1362CFE071E00AE4BA0 /* Codable+Covertable.swift */,
+				9D4146A02D008E4C000F83B9 /* GSDefine.swift */,
 			);
 			path = Socket;
 			sourceTree = "<group>";
@@ -119,11 +134,6 @@
 				9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */,
 				9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */,
 				9D0FA6F32A1488830091D0E7 /* ViewController.swift */,
-				9D0675732CF251FA00C4E797 /* IMG_1555_2.mov */,
-				9D8FF4282CEA2AF300896444 /* okzxVsJNxXc.jpg */,
-				9D8FF4262CE9E54B00896444 /* test.txt */,
-				9D0675702CF23C1600C4E797 /* 故障.txt */,
-				9D8FF4242CE9DD2300896444 /* test.jpg */,
 				9D0FA6F52A1488830091D0E7 /* Main.storyboard */,
 				9D0FA6F82A1488840091D0E7 /* Assets.xcassets */,
 				9D0FA6FA2A1488840091D0E7 /* LaunchScreen.storyboard */,
@@ -145,6 +155,7 @@
 				9D0FA6E92A1488830091D0E7 /* Frameworks */,
 				9D0FA6EA2A1488830091D0E7 /* Resources */,
 				F3F86F89C6F54A6443B29FAC /* [CP] Embed Pods Frameworks */,
+				9D03F1332CFE022500AE4BA0 /* Embed PlugIns */,
 			);
 			buildRules = (
 			);
@@ -193,14 +204,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9D8FF4292CEA2AF300896444 /* okzxVsJNxXc.jpg in Resources */,
 				9D0FA6FC2A1488840091D0E7 /* LaunchScreen.storyboard in Resources */,
 				9D0FA6F92A1488840091D0E7 /* Assets.xcassets in Resources */,
-				9D0675742CF251FA00C4E797 /* IMG_1555_2.mov in Resources */,
 				9D0FA6F72A1488830091D0E7 /* Main.storyboard in Resources */,
-				9D8FF4252CE9DD2300896444 /* test.jpg in Resources */,
-				9D8FF4272CE9E54B00896444 /* test.txt in Resources */,
-				9D0675712CF23C1600C4E797 /* 故障.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,7 +265,9 @@
 				9D0FA7042A1489F50091D0E7 /* ServerSocketManager.swift in Sources */,
 				9D0B6D9B2CEF6FD600FA009F /* SendMessageTask.swift in Sources */,
 				9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */,
+				9D03F1372CFE071E00AE4BA0 /* Codable+Covertable.swift in Sources */,
 				9D03F1302CFCA1A500AE4BA0 /* ReceiveMessageTask.swift in Sources */,
+				9D4146A12D008E4C000F83B9 /* GSDefine.swift in Sources */,
 				9D0FA7062A1489FE0091D0E7 /* ClientSocketManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -412,6 +420,9 @@
 				DEVELOPMENT_TEAM = E7W6597ZYH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GCDSocketDemo/Info.plist;
+				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "需要访问桌面文件夹以加载文件。";
+				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = "需要访问文档文件夹以加载文件。";
+				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = "需要访问下载文件夹以加载文件。";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要访问本地网络以监听端口";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -427,7 +438,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = lzp.GCDSocketDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/GCDSocketDemo-Brigding-Header.h";
@@ -448,6 +459,9 @@
 				DEVELOPMENT_TEAM = E7W6597ZYH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GCDSocketDemo/Info.plist;
+				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "需要访问桌面文件夹以加载文件。";
+				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = "需要访问文档文件夹以加载文件。";
+				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = "需要访问下载文件夹以加载文件。";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "需要访问本地网络以监听端口";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -463,7 +477,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = lzp.GCDSocketDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/GCDSocketDemo-Brigding-Header.h";

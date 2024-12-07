@@ -25,52 +25,81 @@ class ServerSocketManager: SocketBaseManager {
     }
     
     var clientSocket: GCDAsyncSocket?
+    
+    let rootPath = "/Users/garenge/Downloads"
+    
+    override func receiveRequestFileList(_ messageFormat: SocketMessageFormat) {
+        print("Server 收到文件列表请求")
+        print(messageFormat)
+        
+        self.sendFolderList(folderPath: messageFormat.content)
+    }
 }
 
 extension ServerSocketManager {
     
     /// 发送消息
-    func sendMessage() {
+    func sendTestMessage() {
         // 模拟多任务队列
-        do {
-            // 构造一个json
-            let json = ["name": "Server", "age": 18] as [String : Any]
-            if let data = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-                self.sendDirectionData(socket: self.clientSocket, data: data)
-            }
-        }
-        do {
-            guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
-                print("文件不存在")
-                return
-            }
-            if let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) {
-                self.sendDirectionData(socket: self.clientSocket, data: data)
-            }
-        }
-        do {
-            guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
-                print("文件不存在")
-                return
-            }
-            self.sendFileData(socket: self.clientSocket, filePath: filePath)
-        }
-//        
 //        do {
-//            guard let filePath = Bundle.main.path(forResource: "故障.txt", ofType: nil) else {
-//                print("文件不存在")
-//                return
+//            // 构造一个json
+//            let json = ["name": "Server", "age": 18] as [String : Any]
+//            if let data = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+//                self.sendDirectionData(socket: self.clientSocket, data: data)
 //            }
-//            self.sendFileData(socket: self.clientSocket, filePath: filePath)
 //        }
 //        do {
-//            guard let filePath = Bundle.main.path(forResource: "IMG_1555.MOV", ofType: nil) else {
+//            guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
 //                print("文件不存在")
 //                return
 //            }
-//            self.sendFileData(socket: self.clientSocket, filePath: filePath)
+//            if let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) {
+//                self.sendDirectionData(socket: self.clientSocket, data: data)
+//            }
 //        }
     }
+    
+    /// 发送文件夹下的文件列表 folderPath: 空表示根目录
+    func sendFolderList(folderPath: String?) {
+        let filePath = (rootPath as NSString).appendingPathComponent(folderPath ?? "")
+        do {
+            let fileList = try FileManager.default.contentsOfDirectory(atPath: filePath)
+            let models: [FileModel] = fileList.map({ fileName in
+                
+                var fileModel = FileModel()
+                fileModel.filePath = (filePath as NSString).appendingPathComponent(fileName)
+                
+                return fileModel
+            })
+            
+            guard let jsonData = models.convertToJsonData(), let responseStr = String(data: jsonData, encoding: .utf8) else {
+                self.sendDirectionData(socket: self.clientSocket, data: nil)
+                return
+            }
+            let messageFormat = SocketMessageFormat.format(action: .responseFileList, content: responseStr)
+            self.sendDirectionData(socket: self.clientSocket, data: messageFormat.convertToJsonData())
+        } catch {
+            print("Server 获取文件列表失败: \(error)")
+            self.sendDirectionData(socket: self.clientSocket, data: nil)
+        }
+    }
+    
+    /// 发送文件信息
+    func sendFileInfo(filePath: String) {
+        var fileModel = FileModel()
+        fileModel.filePath = filePath
+        
+        guard let jsonDic = fileModel.convertToDict(), let jsonData = try? JSONSerialization.data(withJSONObject: jsonDic, options: .prettyPrinted) else {
+            return
+        }
+        self.sendDirectionData(socket: self.clientSocket, data: jsonData)
+    }
+    
+    /// 发送文件流
+    func sendFile(filePath: String) {
+        self.sendFileData(socket: self.clientSocket, filePath: filePath)
+    }
+    
 }
 
 extension ServerSocketManager: GCDAsyncSocketDelegate {
