@@ -59,7 +59,47 @@ extension ClientSocketManager {
     /// 获取文件列表
     func sendQueryFileList() {
         let format = SocketMessageFormat.format(action: .requestFileList, content: nil)
-        self.sendDirectionData(socket: self.socket, data: format.convertToJsonData())
+        self.sendDirectionData(socket: self.socket, data: format.convertToJsonData(), receiveBlock: { messageTask in
+            print("Client 发送文件列表请求, 收到回复, \(messageTask?.description ?? "")");
+            guard let messageTask = messageTask, let messageFormat = SocketMessageFormat.format(from: messageTask.directionData!, messageKey: messageTask.messageKey), messageFormat.action == GSActions.responseFileList.getActionString() else {
+                return
+            }
+            let jsonDecoder = JSONDecoder()
+            guard let content = messageFormat.content, let data = content.data(using: .utf8), let fileList = try? jsonDecoder.decode([FileModel].self, from: data) else {
+                return
+            }
+            if fileList.count > 0 {
+                // 尝试下载第一个文件
+                self.sendDownloadRequest(filePath: fileList[0].filePath)
+            }
+        })
+    }
+    
+    func sendDownloadRequest(filePath: String?) {
+        guard let filePath = filePath else {
+            return
+        }
+        let format = SocketMessageFormat.format(action: .requestToDownloadFile, content: filePath)
+        self.sendDirectionData(socket: self.socket, data: format.convertToJsonData()) { messageTask in
+            guard let messageTask = messageTask else { return }
+            print("Client 下载文件 进度: \(messageTask.progress)")
+        } receiveBlock: { [weak self] messageTask in
+            guard let self = self else { return }
+            print("Client 下载文件 结束 \(messageTask?.description ?? "")");
+            
+            guard let messageTask = messageTask, let localPath = messageTask.filePath else {
+                return
+            }
+            
+            let fileName = String.GenerateRandomString() + "." + (filePath as NSString).pathExtension
+            let finalPath = self.getDocumentDirectory() + "/" + fileName
+            do {
+                try FileManager.default.copyItem(atPath: localPath, toPath: finalPath)
+                print("Client 下载文件成功: \(finalPath)")
+            } catch {
+                print("Client 下载文件失败: \(error)")
+            }
+        }
     }
 }
 

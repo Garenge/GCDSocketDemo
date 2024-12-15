@@ -32,7 +32,17 @@ class ServerSocketManager: SocketBaseManager {
         print("Server 收到文件列表请求")
         print(messageFormat)
         
-        self.sendFolderList(folderPath: messageFormat.content)
+        self.sendFolderList(folderPath: messageFormat.content, messageKey: messageFormat.messageKey)
+    }
+    
+    override func receiveRequestToDownloadFile(_ messageFormat: SocketMessageFormat) {
+        print("Server 收到下载文件请求")
+        print(messageFormat)
+        guard let content = messageFormat.content else {
+            self.sendDirectionData(socket: self.clientSocket, data: nil, messageKey: messageFormat.messageKey, receiveBlock: nil)
+            return
+        }
+        self.sendFile(filePath: content, messageKey: messageFormat.messageKey)
     }
 }
 
@@ -60,7 +70,7 @@ extension ServerSocketManager {
     }
     
     /// 发送文件夹下的文件列表 folderPath: 空表示根目录
-    func sendFolderList(folderPath: String?) {
+    func sendFolderList(folderPath: String?, messageKey: String?) {
         let filePath = (rootPath as NSString).appendingPathComponent(folderPath ?? "")
         do {
             let fileList = try FileManager.default.contentsOfDirectory(atPath: filePath)
@@ -73,14 +83,14 @@ extension ServerSocketManager {
             })
             
             guard let jsonData = models.convertToJsonData(), let responseStr = String(data: jsonData, encoding: .utf8) else {
-                self.sendDirectionData(socket: self.clientSocket, data: nil)
+                self.sendDirectionData(socket: self.clientSocket, data: nil, messageKey: messageKey, receiveBlock: nil)
                 return
             }
-            let messageFormat = SocketMessageFormat.format(action: .responseFileList, content: responseStr)
-            self.sendDirectionData(socket: self.clientSocket, data: messageFormat.convertToJsonData())
+            let messageFormat = SocketMessageFormat.format(action: .responseFileList, content: responseStr, messageKey: messageKey)
+            self.sendDirectionData(socket: self.clientSocket, data: messageFormat.convertToJsonData(), messageKey: messageKey, receiveBlock: nil)
         } catch {
             print("Server 获取文件列表失败: \(error)")
-            self.sendDirectionData(socket: self.clientSocket, data: nil)
+            self.sendDirectionData(socket: self.clientSocket, data: nil, messageKey: messageKey, receiveBlock: nil)
         }
     }
     
@@ -92,12 +102,12 @@ extension ServerSocketManager {
         guard let jsonDic = fileModel.convertToDict(), let jsonData = try? JSONSerialization.data(withJSONObject: jsonDic, options: .prettyPrinted) else {
             return
         }
-        self.sendDirectionData(socket: self.clientSocket, data: jsonData)
+        self.sendDirectionData(socket: self.clientSocket, data: jsonData, receiveBlock: nil)
     }
     
     /// 发送文件流
-    func sendFile(filePath: String) {
-        self.sendFileData(socket: self.clientSocket, filePath: filePath)
+    func sendFile(filePath: String, messageKey: String?) {
+        self.sendFileData(socket: self.clientSocket, filePath: filePath, messageKey: messageKey)
     }
     
 }
