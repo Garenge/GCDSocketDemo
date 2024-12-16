@@ -30,7 +30,10 @@ extension String {
 
 
 struct FileModel: Codable, Convertable {
+    
+    /// 文件名
     var fileName: String?
+    /// 文件路径
     var filePath: String? {
         didSet {
             if let path = filePath {
@@ -40,13 +43,28 @@ struct FileModel: Codable, Convertable {
                     fileName = url.lastPathComponent
                     fileSize = attr[FileAttributeKey.size] as? UInt64 ?? 0
                     pathExtension = url.pathExtension
+                    
+                    if let fileType = attr[FileAttributeKey.type] as? FileAttributeType {
+                        switch fileType {
+                        case .typeDirectory:
+                            isFolder = true
+                        case .typeRegular:
+                            isFolder = false
+                        default:
+                            isFolder = false
+                        }
+                    }
                 } catch {
                     print("获取文件信息失败: \(error)")
                 }
             }
         }
     }
+    /// 文件大小
     var fileSize: UInt64 = 0
+    /// 是否是文件夹
+    var isFolder: Bool = false
+    /// 文件后缀名
     var pathExtension: String?
     /// 此文件, 会对应一个本地的唯一key, 到时候client请求下载, server将key作为事件名称
     var fileKey: String = String.GenerateRandomString()
