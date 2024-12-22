@@ -22,7 +22,7 @@
 		9D0FA6FC2A1488840091D0E7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6FA2A1488840091D0E7 /* LaunchScreen.storyboard */; };
 		9D0FA7042A1489F50091D0E7 /* ServerSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */; };
 		9D0FA7062A1489FE0091D0E7 /* ClientSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */; };
-		9D4146A12D008E4C000F83B9 /* GSDefine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D4146A02D008E4C000F83B9 /* GSDefine.swift */; };
+		9D2C7EFB2D1810A300702B89 /* GSDefine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2C7EFA2D1810A300702B89 /* GSDefine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -58,7 +58,7 @@
 		9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSocketManager.swift; sourceTree = "<group>"; };
 		9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientSocketManager.swift; sourceTree = "<group>"; };
 		9D0FA70B2A1495950091D0E7 /* GCDSocketDemo-Brigding-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GCDSocketDemo-Brigding-Header.h"; sourceTree = "<group>"; };
-		9D4146A02D008E4C000F83B9 /* GSDefine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GSDefine.swift; path = /Applications/GSDefine.swift; sourceTree = "<absolute>"; };
+		9D2C7EFA2D1810A300702B89 /* GSDefine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSDefine.swift; sourceTree = "<group>"; };
 		DD03948A9DD25EBA0088A7E6 /* Pods-GCDSocketDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GCDSocketDemo.release.xcconfig"; path = "Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo.release.xcconfig"; sourceTree = "<group>"; };
 		E330B0528B2C627878E6B58C /* Pods-GCDSocketDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GCDSocketDemo.debug.xcconfig"; path = "Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -103,7 +103,7 @@
 				9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */,
 				9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */,
 				9D03F1362CFE071E00AE4BA0 /* Codable+Covertable.swift */,
-				9D4146A02D008E4C000F83B9 /* GSDefine.swift */,
+				9D2C7EFA2D1810A300702B89 /* GSDefine.swift */,
 			);
 			path = Socket;
 			sourceTree = "<group>";
@@ -267,7 +267,7 @@
 				9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */,
 				9D03F1372CFE071E00AE4BA0 /* Codable+Covertable.swift in Sources */,
 				9D03F1302CFCA1A500AE4BA0 /* ReceiveMessageTask.swift in Sources */,
-				9D4146A12D008E4C000F83B9 /* GSDefine.swift in Sources */,
+				9D2C7EFB2D1810A300702B89 /* GSDefine.swift in Sources */,
 				9D0FA7062A1489FE0091D0E7 /* ClientSocketManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
