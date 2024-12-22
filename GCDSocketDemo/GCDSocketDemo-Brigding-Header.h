@@ -9,6 +9,6 @@
 #define GCDSocketDemo_Bridge_Header_h
 
 #import <CocoaAsyncSocket/GCDAsyncSocket.h>
-
+#import "NSString+Ex.h"
 
 #endif /* GCDSocketDemo_Bridge_Header_h */

@@ -76,6 +76,11 @@ class ViewController: UIViewController {
         }
         server.sendFileInfo(filePath: filePath)
     }
+    @IBAction func doShowFiles(_ sender: Any) {
+        let filesVC = FilesListViewController()
+        filesVC.client = client
+        self.navigationController?.pushViewController(filesVC, animated: true)
+    }
 }
 
 extension ViewController: UITextFieldDelegate {

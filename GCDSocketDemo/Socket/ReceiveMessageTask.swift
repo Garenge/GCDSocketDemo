@@ -16,7 +16,9 @@ class ReceiveMessageTask: NSObject {
     var messageKey: String? {
         didSet {
             if messageKey != nil {
-                initialReceiveSpeedTimer()
+                DispatchQueue.main.async {
+                    self.initialReceiveSpeedTimer()
+                }
             }
         }
     }
@@ -94,6 +96,7 @@ class ReceiveMessageTask: NSObject {
     private func finishReceiveTask() {
         self.calculateReceiveSpeed()
         toReceiveSpeedTimer?.invalidate()
+        toReceiveSpeedTimer = nil
         self.calculateReceiveSpeed()
     }
 }

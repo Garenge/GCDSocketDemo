@@ -53,25 +53,24 @@ extension ClientSocketManager {
 //            }
 //            self.sendFileData(socket: self.socket, filePath: filePath)
 //        }
-        self.sendQueryFileList()
+//        self.sendQueryFileList()
     }
     
     /// 获取文件列表
-    func sendQueryFileList() {
+    func sendQueryFileList(finished: ((_ fileList: [FileModel]?) -> Void)?) {
         let format = SocketMessageFormat.format(action: .requestFileList, content: nil)
         self.sendDirectionData(socket: self.socket, data: format.convertToJsonData(), receiveBlock: { messageTask in
             print("Client 发送文件列表请求, 收到回复, \(messageTask?.description ?? "")");
             guard let messageTask = messageTask, let messageFormat = SocketMessageFormat.format(from: messageTask.directionData!, messageKey: messageTask.messageKey), messageFormat.action == GSActions.responseFileList.getActionString() else {
+                finished?(nil)
                 return
             }
             let jsonDecoder = JSONDecoder()
             guard let content = messageFormat.content, let data = content.data(using: .utf8), let fileList = try? jsonDecoder.decode([FileModel].self, from: data) else {
+                finished?(nil)
                 return
             }
-            if fileList.count > 0 {
-                // 尝试下载第一个文件
-                self.sendDownloadRequest(filePath: fileList[0].filePath)
-            }
+            finished?(fileList)
         })
     }
     
@@ -91,7 +90,7 @@ extension ClientSocketManager {
                 return
             }
             
-            let fileName = String.GenerateRandomString() + "." + (filePath as NSString).pathExtension
+            let fileName = (filePath as NSString).pathExtension.count > 0 ? (String.GenerateRandomString() + "." + (filePath as NSString).pathExtension) : String.GenerateRandomString()
             let finalPath = self.getDocumentDirectory() + "/" + fileName
             do {
                 try FileManager.default.copyItem(atPath: localPath, toPath: finalPath)

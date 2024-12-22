@@ -28,7 +28,7 @@
                                     <action selector="send1Action:" destination="BYZ-38-t0r" eventType="touchUpInside" id="FTX-CZ-A6T"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zV2-yi-seH">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zV2-yi-seH">
                                 <rect key="frame" x="248" y="788" width="125.5" height="44"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="客户端发消息"/>
@@ -167,7 +167,13 @@
                             <constraint firstItem="wUv-Jd-Dcy" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="12" id="yaT-et-Jud"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="socket设置" id="uYU-ba-nrI"/>
+                    <navigationItem key="navigationItem" title="socket设置" id="uYU-ba-nrI">
+                        <barButtonItem key="rightBarButtonItem" title="Files" id="xLF-Qm-cmX">
+                            <connections>
+                                <action selector="doShowFiles:" destination="BYZ-38-t0r" id="d1W-Nk-3g1"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="filePathTF" destination="sdi-mf-0af" id="lwJ-B1-oWf"/>
                         <outlet property="selectFileView" destination="AKW-HP-rID" id="Ugx-re-bIj"/>

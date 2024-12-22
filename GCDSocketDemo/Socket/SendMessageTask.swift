@@ -110,6 +110,7 @@ class SendMessageTask: NSObject {
     private func finishSendTask() {
         self.calculateSendSpeed()
         toSendSpeedTimer?.invalidate()
+        toSendSpeedTimer = nil
     }
     
     var prefixLength = 20 + 8 + 8 + 8 + 16
