@@ -12,6 +12,10 @@ typealias ReceiveMessageTaskBlock = (_ messageTask: ReceiveMessageTask?) -> ()
 
 /// 收消息的模型
 class ReceiveMessageTask: NSObject {
+    
+    deinit {
+        print("======== ReceiveMessageTask \(self) deinit ========")
+    }
     /// 每个任务有独一无二的key
     var messageKey: String? {
         didSet {
@@ -67,7 +71,7 @@ class ReceiveMessageTask: NSObject {
     /// 网速
     public var toReceiveTransSpeed: UInt64 = 0 {
         didSet {
-            print("当前接收数据网速: \(toReceiveTransSpeed)B/s")
+            print("当前: \(self) 接收数据网速: \(toReceiveTransSpeed)B/s")
             toReceiveTransSpeedChangedBlock?(toReceiveTransSpeed)
         }
     }
@@ -93,7 +97,7 @@ class ReceiveMessageTask: NSObject {
         self.toReceiveLastSpeedValue = self.receivedOffset
     }
     
-    private func finishReceiveTask() {
+    public func finishReceiveTask() {
         self.calculateReceiveSpeed()
         toReceiveSpeedTimer?.invalidate()
         toReceiveSpeedTimer = nil

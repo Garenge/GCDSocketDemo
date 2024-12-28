@@ -101,12 +101,6 @@ struct SocketMessageFormat: Codable, Convertable {
 
 class SocketBaseManager: NSObject {
     
-    /// 标记当前任务的序号, 可以理解为唯一标识, 处理完一个事件, 需要重置
-    var sendMessageIndex = String.GenerateRandomString(length: 18) {
-        didSet {
-            print("====")
-        }
-    }
     /// 18, 事件名称, 无业务意义, 仅用作判断相同消息
     /// 2, 数据类型, 00: 默认, json, 01: 文件
     /// 8个长度, 分包, 包的个数 // 一个包, 放 maxBodyLength - prefixLength
@@ -127,44 +121,59 @@ class SocketBaseManager: NSObject {
     }()
     
     /// 直接发送数据, 直传(尽量文件不用直传, 采用文件专门的传输, 或者文件传输的时候, key用文件自己的key)
-    func sendDirectionData(socket: GCDAsyncSocket?, data: Data?, messageKey: String? = nil, progressBlock: ReceiveMessageTaskBlock? = nil, receiveBlock: ReceiveMessageTaskBlock?) {
+    @discardableResult
+    func sendDirectionData(socket: GCDAsyncSocket?, data: Data?, messageKey: String? = nil, progressBlock: ReceiveMessageTaskBlock? = nil, receiveBlock: ReceiveMessageTaskBlock?) -> String {
         let operation = PPCustomAsyncOperation()
+        if let messageKey = messageKey, messageKey.count > 0 {
+            operation.identifier = messageKey
+        } else {
+            operation.identifier = String.GenerateRandomString(length: 18)
+        }
         operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
             self?.currentSendMessageTask = SendMessageTask()
             self?.currentSendMessageTask?.hasAllMessageDone = false
             self?.currentSendMessageTask?.messageType = .directionData
             self?.currentSendMessageTask?.toSendDirectionData = data ?? Data()
-            if let messageKey = messageKey, messageKey.count > 0 {
-                self?.sendMessageIndex = messageKey
-            }
-            if progressBlock != nil || receiveBlock != nil, let messageKey = self?.sendMessageIndex, messageKey.count > 0 {
+            //            if let messageKey = messageKey, messageKey.count > 0 {
+            //                self?.currentSendMessageTask?.sendMessageIndex = messageKey
+            //            }
+            self?.currentSendMessageTask?.sendMessageIndex = operation.identifier
+            if progressBlock != nil || receiveBlock != nil, let messageKey = self?.currentSendMessageTask?.sendMessageIndex, messageKey.count > 0 {
                 let messageBody = ReceiveMessageTask()
                 messageBody.messageKey = messageKey
                 messageBody.didReceiveDataProgressBlock = progressBlock
                 messageBody.didReceiveDataCompleteBlock = receiveBlock
                 self?.receivedMessageDic[messageKey] = messageBody
+                print("======== 准备发送数据, 回调messageKey: \(messageKey)")
             }
             
             self?.sendBodyMessage(socket: socket)
             return false
         }
         sendMessageQueue.addOperation(operation)
+        
+        return operation.identifier
     }
     
     /// 发送文件data
     func sendFileData(socket: GCDAsyncSocket?, filePath: String, messageKey: String? = nil) {
         
         let operation = PPCustomAsyncOperation()
+        if let messageKey = messageKey, messageKey.count > 0 {
+            operation.identifier = messageKey
+        } else {
+            operation.identifier = String.GenerateRandomString(length: 18)
+        }
         operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
             self?.currentSendMessageTask = SendMessageTask()
             self?.currentSendMessageTask?.hasAllMessageDone = false
             self?.currentSendMessageTask?.messageType = .fileData
             self?.currentSendMessageTask?.readFilePath = filePath
             
-            if let messageKey = messageKey, messageKey.count > 0 {
-                self?.sendMessageIndex = messageKey
-            }
-            
+            //            if let messageKey = messageKey, messageKey.count > 0 {
+            //                self?.currentSendMessageTask?.sendMessageIndex = messageKey
+            //            }
+            self?.currentSendMessageTask?.sendMessageIndex = operation.identifier
             self?.sendBodyMessage(socket: socket)
             return false
         }
@@ -179,9 +188,12 @@ class SocketBaseManager: NSObject {
                 self?.sendCellBodyData(socket: socket, bodyData: bodyData, messageType: .directionData, totalBodyCount: totalBodyCount, index: index)
             }, finishedAllTask: { [weak self] (isSuccess, msg) in
                 /// 上个任务结束
-                self?.sendMessageIndex = String.GenerateRandomString(length: 18)
-                self?.currentSendMessageTask = nil
-                (self?.sendMessageQueue.operations.first as? PPCustomAsyncOperation)?.finish()
+                if let currentSendMessageTask = self?.currentSendMessageTask {
+                    let messageKey = currentSendMessageTask.sendMessageIndex
+                    
+                    self?.currentSendMessageTask = nil
+                    self?.cancelOperation(with: messageKey)
+                }
             })
         case .fileData:
             self.currentSendMessageTask?.createSendFileBodyData { [weak self] (bodyData, totalBodyCount, index) in
@@ -191,9 +203,12 @@ class SocketBaseManager: NSObject {
             } finishedAllTask: { [weak self] in
                 
                 /// 上个任务结束
-                self?.sendMessageIndex = String.GenerateRandomString(length: 18)
-                self?.currentSendMessageTask = nil
-                (self?.sendMessageQueue.operations.first as? PPCustomAsyncOperation)?.finish()
+                if let currentSendMessageTask = self?.currentSendMessageTask {
+                    let messageKey = currentSendMessageTask.sendMessageIndex
+                    
+                    self?.currentSendMessageTask = nil
+                    self?.cancelOperation(with: messageKey)
+                }
             } failureBlock: { msg in
                 print(msg)
             }
@@ -204,14 +219,89 @@ class SocketBaseManager: NSObject {
     
     /// 分包发送数据
     func sendCellBodyData(socket: GCDAsyncSocket?, bodyData: Data, messageType: TransMessageType, totalBodyCount: Int, index: Int) {
-        let messageCode = sendMessageIndex
+        guard let messageCode = currentSendMessageTask?.sendMessageIndex else {
+            return
+        }
         if let sendData = currentSendMessageTask?.createSendCellBodyData(bodyData: bodyData, messageCode: messageCode, messageType: messageType, totalBodyCount: totalBodyCount, index: index) {
             socket?.write(sendData, withTimeout: -1, tag: 10086)
         }
     }
     
+    /// 发消息给对方, 告诉他, 这个任务我要取消
+    func sendToCancelTask(socket: GCDAsyncSocket?, messageKey: String, receiveBlock: ReceiveMessageTaskBlock?) {
+        let format = SocketMessageFormat.format(action: .requestToCancelTask, content: messageKey)
+        print("发送取消任务: \(self), \(format)")
+        self.sendDirectionData(socket: socket, data: format.convertToJsonData()) { [weak self] messageTask in
+            guard let self = self else { return }
+            self.releaseReceiveMessageTask(messageKey)
+            print("发送取消任务: \(self), 收到回复, \(messageTask?.description ?? "")");
+            receiveBlock?(messageTask)
+        }
+    }
+    
+    /// 取消当前发送的任务(可能正在发, 可能正在收), 取消发和收的任务
+    /// - Parameter messageKey: 任务id, 如果为空, 表示清空所有任务
+    func cancelSendingTask(socket: GCDAsyncSocket?, content: String?, messageKey: String?, receiveBlock: ReceiveMessageTaskBlock?) {
+        
+        // 首先停止当前的发送任务
+        if self.currentSendMessageTask?.sendMessageIndex == content, let messageKey = messageKey, messageKey.count > 0 {
+            self.currentSendMessageTask = nil
+            var format = SocketMessageFormat.format(action: .responseToCancelTask, content: content)
+            format.messageKey = messageKey
+            print("发送取消任务结束回复, \(self), \(format)")
+            self.sendDirectionData(socket: socket, data: format.convertToJsonData(), messageKey: messageKey, progressBlock: nil, receiveBlock: nil)
+        }
+        
+        // 然后停止队列中的任务
+        sendMessageQueue.isSuspended = true
+        if let content = content {
+            let operations = sendMessageQueue.operations as? [PPCustomAsyncOperation]
+            operations?.forEach({ (operation) in
+                if operation.identifier == content {
+                    operation.finish()
+                }
+            })
+        } else {
+            // 此处存疑, 是否因为key不存在, 需要结束其他的任务, 万一client无操作
+            sendMessageQueue.cancelAllOperations()
+        }
+        sendMessageQueue.isSuspended = false
+        
+        // 最后停止收的任务
+        if let content = content, let receiveMessage = self.receivedMessageDic[content] {
+            receiveMessage.didReceiveDataCompleteBlock = nil
+            receiveMessage.didReceiveDataProgressBlock = nil
+            receiveMessage.finishReceiveTask()
+            // 给发送方发消息, 通知取消
+            self.sendToCancelTask(socket: socket, messageKey: content, receiveBlock: receiveBlock)
+            
+            self.releaseReceiveMessageTask(content)
+        }
+    }
+    
+    func cancelOperation(with identifier: String) {
+        sendMessageQueue.isSuspended = true
+        let operations = sendMessageQueue.operations as? [PPCustomAsyncOperation]
+        operations?.forEach({ (operation) in
+            if operation.identifier == identifier {
+                operation.finish()
+            }
+        })
+        sendMessageQueue.isSuspended = false
+    }
+    
     // MARK: - 收消息
-    var receivedMessageDic: [String: ReceiveMessageTask] = [:]
+    private var receivedMessageDic: [String: ReceiveMessageTask] = [:]
+    
+    private func releaseReceiveMessageTask(_ messageKey: String) {
+        if let receiveMessage = self.receivedMessageDic[messageKey] {
+            receiveMessage.didReceiveDataCompleteBlock = nil
+            receiveMessage.didReceiveDataProgressBlock = nil
+            receiveMessage.finishReceiveTask()
+            self.receivedMessageDic[messageKey] = nil
+        }
+    }
+    
     /// tcp是数据流, 所以不代表每次拿到数据就是完整的, 需要自己处理数据的完整性
     var receiveBuffer = Data()
     
@@ -228,165 +318,192 @@ class SocketBaseManager: NSObject {
         return tmpPath
     }
     
+    /// 收到文件列表请求
     func receiveRequestFileList(_ messageFormat: SocketMessageFormat) {
         
     }
     
+    /// 收到文件列表回复
     func receiveResponseFileList(_ messageFormat: SocketMessageFormat) {
         
     }
     
+    /// 收到下载文件请求
     func receiveRequestToDownloadFile(_ messageFormat: SocketMessageFormat) {
         
     }
     
+    /// 收到取消任务请求
+    func receiveRequestToCancelTask(_ messageFormat: SocketMessageFormat) {
+        
+    }
+    
+    /// 收到取消任务回复
+    func receiveResponseToCancelTask(_ messageFormat: SocketMessageFormat) {
+        
+    }
+    
     final func didReceiveData(data: Data) {
-        if (data.count < prefixLength) {
-            return
-        }
-        var parseIndex = 0
-        guard let messageKey = String(data: data.subdata(in: parseIndex..<18), encoding: .utf8) else { return }
-        parseIndex += 18
         
-        guard let messageTypeStr = String(data: data.subdata(in: parseIndex..<parseIndex + 2), encoding: .utf8), let messageType = Int(messageTypeStr) else { return }
-        parseIndex += 2
-        
-        guard let bodyCountStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let bodyCount = Int(bodyCountStr) else { return }
-        parseIndex += 8
-        
-        
-        guard let bodyIndexStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let bodyIndex = Int(bodyIndexStr) else { return }
-        parseIndex += 8
-        
-        guard let bodyLengthStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let _ = Int(bodyLengthStr) else { return }
-        parseIndex += 8
-        
-        guard let totalLengthStr = String(data: data.subdata(in: parseIndex..<parseIndex + 16), encoding: .utf8), let totalLength = UInt64(totalLengthStr) else { return }
-        parseIndex += 16
-        
-        var messageBody = self.receivedMessageDic[messageKey]
-        if nil == messageBody {
-            messageBody = ReceiveMessageTask()
-            messageBody?.messageKey = messageKey
-            self.receivedMessageDic[messageKey] = messageBody
-        }
-        messageBody?.totalLength = totalLength
-        messageBody?.receivedOffset += UInt64(data.count - parseIndex)
-        print("1数据共\(bodyCount)包, 当前第\(bodyIndex)包, 此包大小: \(data.count - parseIndex), 总大小: \(messageBody!.receivedOffset)")
-        messageBody?.bodyCount = bodyCount
-        messageBody?.bodyIndex = bodyIndex
-        
-        // TODO: 根据messageTypeStr区分是文件, 还是json, 选择合适的方式拼接data
-        switch TransMessageType(rawValue: messageType) {
-        case .directionData:
-            self.doReceiveData(messageBody!, data: data, parseIndex: parseIndex)
-        case .fileData: do {
-            self.doReceiveFile(messageBody!, data: data, parseIndex: parseIndex)
-        }
-        default:
-            break
+        autoreleasepool {
+            if (data.count < prefixLength) {
+                return
+            }
+            var parseIndex = 0
+            guard let messageKey = String(data: data.subdata(in: parseIndex..<18), encoding: .utf8) else { return }
+            parseIndex += 18
+            
+            guard let messageTypeStr = String(data: data.subdata(in: parseIndex..<parseIndex + 2), encoding: .utf8), let messageType = Int(messageTypeStr) else { return }
+            parseIndex += 2
+            
+            guard let bodyCountStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let bodyCount = Int(bodyCountStr) else { return }
+            parseIndex += 8
+            
+            
+            guard let bodyIndexStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let bodyIndex = Int(bodyIndexStr) else { return }
+            parseIndex += 8
+            
+            guard let bodyLengthStr = String(data: data.subdata(in: parseIndex..<parseIndex + 8), encoding: .utf8), let _ = Int(bodyLengthStr) else { return }
+            parseIndex += 8
+            
+            guard let totalLengthStr = String(data: data.subdata(in: parseIndex..<parseIndex + 16), encoding: .utf8), let totalLength = UInt64(totalLengthStr) else { return }
+            parseIndex += 16
+            
+            var messageBody = self.receivedMessageDic[messageKey]
+            if nil == messageBody {
+                messageBody = ReceiveMessageTask()
+                messageBody?.messageKey = messageKey
+                self.receivedMessageDic[messageKey] = messageBody
+            }
+            messageBody?.totalLength = totalLength
+            messageBody?.receivedOffset += UInt64(data.count - parseIndex)
+//            print("1数据共\(bodyCount)包, 当前第\(bodyIndex)包, 此包大小: \(data.count - parseIndex), 总大小: \(messageBody!.receivedOffset)")
+            messageBody?.bodyCount = bodyCount
+            messageBody?.bodyIndex = bodyIndex
+            
+            // 根据messageTypeStr区分是文件, 还是json, 选择合适的方式拼接data
+            switch TransMessageType(rawValue: messageType) {
+            case .directionData:
+                self.doReceiveData(messageBody!, data: data, parseIndex: parseIndex)
+            case .fileData: do {
+                self.doReceiveFile(messageBody!, data: data, parseIndex: parseIndex)
+            }
+            default:
+                break
+            }
         }
     }
     
     /// 处理收到的文件数据
     func doReceiveFile(_ messageBody: ReceiveMessageTask, data: Data, parseIndex: Int) {
-        guard let messageKey = messageBody.messageKey else {
-            return
-        }
-        if nil == messageBody.fileHandle {
-            // TODO: 理论上, 客户端先请求文件, 然后服务端开始发送文件, 所以客户端是知道文件格式的, 这里可以根据文件格式来确定文件后缀名
-            let fileName = messageKey + ".tmp"
-            messageBody.filePath = getTemporaryDirectory() + "/" + fileName
-            print("文件地址: \(messageBody.filePath ?? "")")
-            if let filePath = messageBody.filePath {
-                try? FileManager.default.removeItem(atPath: filePath)
-                if !FileManager.default.fileExists(atPath: filePath) {
-                    FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
-                }
-                let fileHandle = FileHandle(forWritingAtPath: filePath)
-                messageBody.fileHandle = fileHandle
+        autoreleasepool {
+            guard let messageKey = messageBody.messageKey else {
+                return
             }
-        }
-        
-        // 将文件流直接写到文件中去, 避免内存暴涨
-        let fileData = data.subdata(in: parseIndex..<data.count)
-        
-        messageBody.fileHandle?.write(fileData)
-//        messageBody.receivedOffset += UInt64(fileData.count)
-        
-        try? messageBody.fileHandle?.seek(toOffset: UInt64(messageBody.receivedOffset))
-        
-        messageBody.didReceiveDataProgressBlock?(messageBody)
-        
-        if (messageBody.bodyCount == messageBody.bodyIndex + 1) {
-            print("数据所有包都合并完成")
-            try? messageBody.fileHandle?.close()
-            messageBody.didReceiveDataCompleteBlock?(messageBody)
-            self.receivedMessageDic[messageKey] = nil
+            if nil == messageBody.fileHandle {
+                // 理论上, 客户端先请求文件, 然后服务端开始发送文件, 所以客户端是知道文件格式的, 这里可以根据文件格式来确定文件后缀名
+                let fileName = messageKey + ".tmp"
+                messageBody.filePath = getTemporaryDirectory() + "/" + fileName
+                print("文件地址: \(messageBody.filePath ?? "")")
+                if let filePath = messageBody.filePath {
+                    try? FileManager.default.removeItem(atPath: filePath)
+                    if !FileManager.default.fileExists(atPath: filePath) {
+                        FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
+                    }
+                    let fileHandle = FileHandle(forWritingAtPath: filePath)
+                    messageBody.fileHandle = fileHandle
+                }
+            }
             
-        } else {
-            print("数据所有包未合并完成, 共\(messageBody.bodyCount)包, 当前第\(messageBody.bodyIndex)包, 继续等待")
+            // 将文件流直接写到文件中去, 避免内存暴涨
+            let fileData = data.subdata(in: parseIndex..<data.count)
+            
+            messageBody.fileHandle?.write(fileData)
+            //        messageBody.receivedOffset += UInt64(fileData.count)
+            
+            try? messageBody.fileHandle?.seek(toOffset: UInt64(messageBody.receivedOffset))
+            
+            messageBody.didReceiveDataProgressBlock?(messageBody)
+            
+            if (messageBody.bodyCount == messageBody.bodyIndex + 1) {
+                print("数据所有包都合并完成")
+                try? messageBody.fileHandle?.close()
+                messageBody.didReceiveDataCompleteBlock?(messageBody)
+                self.releaseReceiveMessageTask(messageKey)
+                
+            } else {
+//                print("数据所有包未合并完成, 共\(messageBody.bodyCount)包, 当前第\(messageBody.bodyIndex)包, 继续等待")
+            }
         }
     }
     
     /// 处理收到的data数据
     final func doReceiveData(_ messageBody: ReceiveMessageTask, data: Data, parseIndex: Int) {
-        guard let messageKey = messageBody.messageKey else {
-            return
-        }
-        if nil == messageBody.directionData {
-            messageBody.directionData = Data()
-        }
-        
-        // 直接合并数据
-        messageBody.directionData?.append(data.subdata(in: parseIndex..<data.count))
-        messageBody.receivedOffset += UInt64(data.count - parseIndex)
-        
-        if (messageBody.bodyCount == messageBody.bodyIndex + 1) {
-            print("数据所有包都合并完成")
-            
-            if let didReceiveDataCompleteBlock = messageBody.didReceiveDataCompleteBlock {
-                didReceiveDataCompleteBlock(messageBody)
-                self.receivedMessageDic[messageKey] = nil
+        autoreleasepool {
+            guard let messageKey = messageBody.messageKey else {
                 return
             }
-            
-            
-            // 这里可以封装给子类实现, 由子类去具体解析某些事件 ============================
-            if let messageFormat = SocketMessageFormat.format(from: messageBody.directionData!, messageKey: messageKey) {
-                switch messageFormat.action {
-                case GSActions.requestFileList.getActionString():
-                    self.receiveRequestFileList(messageFormat)
-                    break
-                case GSActions.responseFileList.getActionString():
-                    self.receiveResponseFileList(messageFormat)
-                    break
-                case GSActions.requestToDownloadFile.getActionString():
-                    self.receiveRequestToDownloadFile(messageFormat)
-                    break
-                default:
-                    break
-                }
-            } else {
-                
-                // 可能是文件, 写入文件试试
-                // TODO: 理论上, 客户端先请求文件, 然后服务端开始发送文件, 所以客户端是知道文件格式的, 这里可以根据文件格式来确定文件后缀名
-                let fileName = messageKey + ".data"
-                let filePath = getTemporaryDirectory() + "/" + fileName
-                print("文件地址: \(filePath)")
-                try? FileManager.default.removeItem(atPath: filePath)
-                if !FileManager.default.fileExists(atPath: filePath) {
-                    FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
-                }
-                try? messageBody.directionData?.write(to: URL(fileURLWithPath: filePath))
+            if nil == messageBody.directionData {
+                messageBody.directionData = Data()
             }
-            // 这里可以封装给子类实现, 由子类去具体解析某些事件 ============================
             
+            // 直接合并数据
+            messageBody.directionData?.append(data.subdata(in: parseIndex..<data.count))
+            messageBody.receivedOffset += UInt64(data.count - parseIndex)
             
-            self.receivedMessageDic[messageKey] = nil
-            
-        } else {
-            print("数据所有包未合并完成, 共\(messageBody.bodyCount)包, 当前第\(messageBody.bodyIndex)包, 继续等待")
+            if (messageBody.bodyCount == messageBody.bodyIndex + 1) {
+                print("数据所有包都合并完成")
+                
+                if let didReceiveDataCompleteBlock = messageBody.didReceiveDataCompleteBlock {
+                    didReceiveDataCompleteBlock(messageBody)
+                    self.releaseReceiveMessageTask(messageKey)
+                    return
+                }
+                
+                
+                // 这里可以封装给子类实现, 由子类去具体解析某些事件 ============================
+                if let messageFormat = SocketMessageFormat.format(from: messageBody.directionData!, messageKey: messageKey) {
+                    switch messageFormat.action {
+                    case GSActions.requestFileList.getActionString():
+                        self.receiveRequestFileList(messageFormat)
+                        break
+                    case GSActions.responseFileList.getActionString():
+                        self.receiveResponseFileList(messageFormat)
+                        break
+                    case GSActions.requestToDownloadFile.getActionString():
+                        self.receiveRequestToDownloadFile(messageFormat)
+                        break
+                    case GSActions.requestToCancelTask.getActionString():
+                        // 取消任务
+                        self.receiveRequestToCancelTask(messageFormat)
+                        break
+                    case GSActions.responseToCancelTask.getActionString():
+                        // 取消任务
+                        self.receiveResponseToCancelTask(messageFormat)
+                        break
+                    default:
+                        break
+                    }
+                } else {
+                    
+                    // 收到的数据无法使用指定的模型接收, 姑且当做是文件
+                    let fileName = messageKey + ".data"
+                    let filePath = getTemporaryDirectory() + "/" + fileName
+                    print("文件地址: \(filePath)")
+                    try? FileManager.default.removeItem(atPath: filePath)
+                    if !FileManager.default.fileExists(atPath: filePath) {
+                        FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
+                    }
+                    try? messageBody.directionData?.write(to: URL(fileURLWithPath: filePath))
+                }
+                // 这里可以封装给子类实现, 由子类去具体解析某些事件 ============================
+                
+                
+                self.releaseReceiveMessageTask(messageKey)
+                
+            } else {
+//                print("数据所有包未合并完成, 共\(messageBody.bodyCount)包, 当前第\(messageBody.bodyIndex)包, 继续等待")
+            }
         }
     }
 }

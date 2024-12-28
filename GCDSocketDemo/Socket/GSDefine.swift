@@ -20,6 +20,11 @@ enum GSActions: String {
     /// 响应下载文件
     case responseToDownloadFile
     
+    /// 取消任务
+    case requestToCancelTask
+    /// 响应取消任务
+    case responseToCancelTask
+    
     /// 获取动作字符串, 长度不足18的在前面补0
     func getActionString() -> String {
         let actionString = self.rawValue

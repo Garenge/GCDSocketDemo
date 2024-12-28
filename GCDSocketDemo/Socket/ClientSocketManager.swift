@@ -27,9 +27,21 @@ class ClientSocketManager: SocketBaseManager {
         }
     }
     
+    
+    /// 这个方法其实不会相应, 因为一对一的任务, 基本已经在block中回调了, 如果实现了block, 就不会走这个自定义方法
     override func receiveResponseFileList(_ messageFormat: SocketMessageFormat) {
         print("Client 收到文件列表响应")
         print(messageFormat)
+    }
+    /// 这个方法其实不会相应, 因为一对一的任务, 基本已经在block中回调了, 如果实现了block, 就不会走这个自定义方法
+    override func receiveResponseToCancelTask(_ messageFormat: SocketMessageFormat) {
+        print("Client 收到取消任务响应")
+        print(messageFormat)
+    }
+    
+    /// 取消任务
+    func cancelRequest(_ messageKey: String?, receiveBlock: ReceiveMessageTaskBlock?) {
+        self.cancelSendingTask(socket: self.socket, content: messageKey, messageKey: nil, receiveBlock: receiveBlock)
     }
     
 }
@@ -38,22 +50,22 @@ extension ClientSocketManager {
     
     /// 发送消息
     func sendTestMessage() {
-//        // 模拟多任务队列
-//        do {
-//            // 构造一个json
-//            let json = ["name": "Client", "age": 18] as [String : Any]
-//            if let data = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-//                self.sendDirectionData(socket: self.socket, data: data)
-//            }
-//        }
-//        do {
-//            guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
-//                print("文件不存在")
-//                return
-//            }
-//            self.sendFileData(socket: self.socket, filePath: filePath)
-//        }
-//        self.sendQueryFileList()
+        //        // 模拟多任务队列
+        //        do {
+        //            // 构造一个json
+        //            let json = ["name": "Client", "age": 18] as [String : Any]
+        //            if let data = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+        //                self.sendDirectionData(socket: self.socket, data: data)
+        //            }
+        //        }
+        //        do {
+        //            guard let filePath = Bundle.main.path(forResource: "okzxVsJNxXc.jpg", ofType: nil) else {
+        //                print("文件不存在")
+        //                return
+        //            }
+        //            self.sendFileData(socket: self.socket, filePath: filePath)
+        //        }
+        //        self.sendQueryFileList()
     }
     
     /// 获取文件列表
@@ -74,19 +86,21 @@ extension ClientSocketManager {
         })
     }
     
-    func sendDownloadRequest(filePath: String?) {
+    func sendDownloadRequest(filePath: String?, progressBlock: ReceiveMessageTaskBlock? = nil, receiveBlock: ReceiveMessageTaskBlock? = nil) -> String? {
         guard let filePath = filePath else {
-            return
+            return nil
         }
         let format = SocketMessageFormat.format(action: .requestToDownloadFile, content: filePath)
-        self.sendDirectionData(socket: self.socket, data: format.convertToJsonData()) { messageTask in
+        let messageKey = self.sendDirectionData(socket: self.socket, data: format.convertToJsonData()) { messageTask in
             guard let messageTask = messageTask else { return }
-            print("Client 下载文件 进度: \(messageTask.progress)")
+//            print("Client 下载文件 进度: \(String(format: "%.2f", messageTask.progress * 100))%")
+            progressBlock?(messageTask)
         } receiveBlock: { [weak self] messageTask in
             guard let self = self else { return }
             print("Client 下载文件 结束 \(messageTask?.description ?? "")");
             
             guard let messageTask = messageTask, let localPath = messageTask.filePath else {
+                receiveBlock?(messageTask)
                 return
             }
             
@@ -98,7 +112,9 @@ extension ClientSocketManager {
             } catch {
                 print("Client 下载文件失败: \(error)")
             }
+            receiveBlock?(messageTask)
         }
+        return messageKey
     }
 }
 
@@ -115,7 +131,7 @@ extension ClientSocketManager: GCDAsyncSocketDelegate {
     
     func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
         
-        print("Client 已收到消息:")
+//        print("Client 已收到消息:")
         // 将新收到的数据追加到缓冲区
         receiveBuffer.append(data)
         

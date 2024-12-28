@@ -18,6 +18,13 @@ class SendMessageTask: NSObject {
     
     public var messageType: TransMessageType = .directionData
     
+    /// 标记当前任务的序号, 可以理解为唯一标识
+    var sendMessageIndex = String.GenerateRandomString(length: 18) {
+        didSet {
+            print("====")
+        }
+    }
+    
     /// 如果是直接传输数据, 记录总data
     var toSendDirectionData: Data? {
         didSet {
@@ -107,7 +114,7 @@ class SendMessageTask: NSObject {
         self.toSendLastSpeedValue = self.readedOffset
     }
     
-    private func finishSendTask() {
+    private func releaseSpeedCalculate() {
         self.calculateSendSpeed()
         toSendSpeedTimer?.invalidate()
         toSendSpeedTimer = nil
@@ -157,7 +164,7 @@ class SendMessageTask: NSObject {
         if (hasAllMessageDone) {
             calculateSendSpeed()
             finishedAllTask?(true, nil)
-            finishSendTask()
+            releaseSpeedCalculate()
         }
     }
     
@@ -182,7 +189,7 @@ class SendMessageTask: NSObject {
             if toSendTotalSize > 0, let data = readFileHandle?.readData(ofLength: Int(toSendTotalSize - readedOffset)) {
                 bodyData.append(data)
                 readedOffset = toSendTotalSize
-                readFileHandle?.closeFile()
+//                readFileHandle?.closeFile()
                 hasAllMessageDone = true
             }
         } else {
@@ -190,9 +197,14 @@ class SendMessageTask: NSObject {
             if let data = readFileHandle?.readData(ofLength: maxReadedCount) {
                 bodyData.append(data)
                 readedOffset += UInt64(maxReadedCount)
+//                try? readFileHandle?.seek(toOffset: readedOffset)
             }
         }
-        try? readFileHandle?.seek(toOffset: readedOffset)
+        do {
+            try readFileHandle?.seek(toOffset: readedOffset)
+        } catch {
+            print("======== sendFile error: \(error)")
+        }
         
         cellMessageBlock?(bodyData, toSendBodyTotalCount, toSendBodyCurrentIndex)
         toSendBodyCurrentIndex += 1
@@ -200,7 +212,7 @@ class SendMessageTask: NSObject {
             try? readFileHandle?.close()
             calculateSendSpeed()
             finishedAllTask?()
-            finishSendTask()
+            releaseSpeedCalculate()
         }
     }
     
@@ -231,8 +243,8 @@ class SendMessageTask: NSObject {
         
         sendData.append(bodyData)
         
-        print("0数据共\(totalBodyCount)包, 当前第\(index)包, 此包实际数据大小: \(bodyData.count)")
-        print("0数据共\(totalBodyCount)包, 当前第\(index)包, 此包发送体大小: \(sendData.count)")
+//        print("0数据共\(totalBodyCount)包, 当前第\(index)包, 此包实际数据大小: \(bodyData.count)")
+//        print("0数据共\(totalBodyCount)包, 当前第\(index)包, 此包发送体大小: \(sendData.count)")
         
         return sendData
     }

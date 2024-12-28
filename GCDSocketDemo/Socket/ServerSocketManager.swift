@@ -44,6 +44,13 @@ class ServerSocketManager: SocketBaseManager {
         }
         self.sendFile(filePath: content, messageKey: messageFormat.messageKey)
     }
+    
+    override func receiveRequestToCancelTask(_ messageFormat: SocketMessageFormat) {
+        print("Server 收到取消任务请求")
+        print(messageFormat)
+        self.cancelSendingTask(socket: self.clientSocket, content: messageFormat.content, messageKey: messageFormat.messageKey, receiveBlock: nil)
+    }
+    
 }
 
 extension ServerSocketManager {
@@ -74,13 +81,26 @@ extension ServerSocketManager {
         let filePath = (rootPath as NSString).appendingPathComponent(folderPath ?? "")
         do {
             let fileList = try FileManager.default.contentsOfDirectory(atPath: filePath)
-            let models: [FileModel] = fileList.map({ fileName in
-                
+            var models: [FileModel] = fileList.map({ fileName in
                 var fileModel = FileModel()
                 fileModel.filePath = (filePath as NSString).appendingPathComponent(fileName)
                 
                 return fileModel
             })
+            models.sort { (model1, model2) -> Bool in
+                // 文件夹在前面, 文件大小按顺序
+                let inte1 = model1.isFolder ? 1 : 0
+                let inte2 = model2.isFolder ? 1 : 0
+                if inte1 == inte2 {
+                    if (inte1 == 1) {
+                        return (model1.fileName ?? "") < (model2.fileName ?? "")
+                    } else {
+                        return model1.fileSize > model2.fileSize
+                    }
+                } else {
+                    return inte1 > inte2
+                }
+            }
             
             guard let jsonData = models.convertToJsonData(), let responseStr = String(data: jsonData, encoding: .utf8) else {
                 self.sendDirectionData(socket: self.clientSocket, data: nil, messageKey: messageKey, receiveBlock: nil)
@@ -161,7 +181,7 @@ extension ServerSocketManager: GCDAsyncSocketDelegate {
     }
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
-        print("Server 已发送消息, tag:\(tag)")
+//        print("Server 已发送消息, tag:\(tag)")
         self.sendBodyMessage(socket: self.clientSocket)
     }
 }
