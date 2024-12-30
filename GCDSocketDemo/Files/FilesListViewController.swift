@@ -18,6 +18,8 @@ class FilesListViewController: UIViewController {
         return tableView
     }()
     
+    var currentDirectory: String = ""
+    
     /// 当前下载的文件
     var currentDownloadFile: FileModel?
     
@@ -33,7 +35,7 @@ class FilesListViewController: UIViewController {
         
         self.setupSubviews()
         
-        self.client?.sendQueryFileList(finished: { fileList in
+        self.client?.sendQueryFileList(self.currentDirectory, finished: { fileList in
             guard let fileList = fileList else {
                 print("获取文件列表失败")
                 return
@@ -93,9 +95,10 @@ extension FilesListViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         if fileModel.isFolder {
-//            let filesVC = FilesListViewController()
-//            filesVC.client = client
-//            self.navigationController?.pushViewController(filesVC, animated: true)
+            let filesVC = FilesListViewController()
+            filesVC.client = client
+            filesVC.currentDirectory = (self.currentDirectory as NSString).appendingPathComponent(fileModel.fileName ?? "")
+            self.navigationController?.pushViewController(filesVC, animated: true)
         } else {
             let alertVC = UIAlertController(title: "提示", message: "是否下载文件: \(fileModel.fileName ?? "")", preferredStyle: .alert)
             alertVC.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))

@@ -69,8 +69,8 @@ extension ClientSocketManager {
     }
     
     /// 获取文件列表
-    func sendQueryFileList(finished: ((_ fileList: [FileModel]?) -> Void)?) {
-        let format = SocketMessageFormat.format(action: .requestFileList, content: nil)
+    func sendQueryFileList(_ path: String? = nil, finished: ((_ fileList: [FileModel]?) -> Void)?) {
+        let format = SocketMessageFormat.format(action: .requestFileList, content: path)
         self.sendDirectionData(socket: self.socket, data: format.convertToJsonData(), receiveBlock: { messageTask in
             print("Client 发送文件列表请求, 收到回复, \(messageTask?.description ?? "")");
             guard let messageTask = messageTask, let messageFormat = SocketMessageFormat.format(from: messageTask.directionData!, messageKey: messageTask.messageKey), messageFormat.action == GSActions.responseFileList.getActionString() else {
