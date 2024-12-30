@@ -127,6 +127,8 @@ extension ClientSocketManager: GCDAsyncSocketDelegate {
     
     func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         print("Client 已断开: \(String(describing: err))")
+        self.cancelAllSendOperation()
+        self.cancelALLReceiveTask()
     }
     
     func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {

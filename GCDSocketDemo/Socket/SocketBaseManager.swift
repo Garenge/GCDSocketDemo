@@ -192,7 +192,7 @@ class SocketBaseManager: NSObject {
                     let messageKey = currentSendMessageTask.sendMessageIndex
                     
                     self?.currentSendMessageTask = nil
-                    self?.cancelOperation(with: messageKey)
+                    self?.cancelSendOperation(with: messageKey)
                 }
             })
         case .fileData:
@@ -207,7 +207,7 @@ class SocketBaseManager: NSObject {
                     let messageKey = currentSendMessageTask.sendMessageIndex
                     
                     self?.currentSendMessageTask = nil
-                    self?.cancelOperation(with: messageKey)
+                    self?.cancelSendOperation(with: messageKey)
                 }
             } failureBlock: { msg in
                 print(msg)
@@ -279,7 +279,7 @@ class SocketBaseManager: NSObject {
         }
     }
     
-    func cancelOperation(with identifier: String) {
+    func cancelSendOperation(with identifier: String) {
         sendMessageQueue.isSuspended = true
         let operations = sendMessageQueue.operations as? [PPCustomAsyncOperation]
         operations?.forEach({ (operation) in
@@ -287,6 +287,13 @@ class SocketBaseManager: NSObject {
                 operation.finish()
             }
         })
+        sendMessageQueue.isSuspended = false
+    }
+    
+    // 取消所有发送任务
+    func cancelAllSendOperation() {
+        sendMessageQueue.isSuspended = true
+        sendMessageQueue.cancelAllOperations()
         sendMessageQueue.isSuspended = false
     }
     
@@ -299,6 +306,12 @@ class SocketBaseManager: NSObject {
             receiveMessage.didReceiveDataProgressBlock = nil
             receiveMessage.finishReceiveTask()
             self.receivedMessageDic[messageKey] = nil
+        }
+    }
+    
+    func cancelALLReceiveTask() {
+        for (key, _) in self.receivedMessageDic {
+            self.releaseReceiveMessageTask(key)
         }
     }
     
