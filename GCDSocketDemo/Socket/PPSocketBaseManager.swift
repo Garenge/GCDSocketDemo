@@ -1,5 +1,5 @@
 //
-//  SocketBaseManager.swift
+//  PPSocketBaseManager.swift
 //  GCDSocketDemo
 //
 //  Created by Garenge on 2024/12/1.
@@ -29,7 +29,7 @@ extension String {
 }
 
 
-struct FileModel: Codable, Convertable {
+struct PPFileModel: Codable, PPSocketConvertable {
     
     /// 文件名
     var fileName: String?
@@ -70,13 +70,13 @@ struct FileModel: Codable, Convertable {
     var fileKey: String = String.GenerateRandomString()
 }
 
-struct SocketMessageFormat: Codable, Convertable {
+struct PPSocketMessageFormat: Codable, PPSocketConvertable {
     var action: String?
     var content: String?
     var messageKey: String = String.GenerateRandomString()
     
-    static func format(action: GSActions, content: String?, messageKey: String? = nil) -> SocketMessageFormat {
-        var format = SocketMessageFormat()
+    static func format(action: PPSocketActions, content: String?, messageKey: String? = nil) -> PPSocketMessageFormat {
+        var format = PPSocketMessageFormat()
         format.action = action.getActionString()
         format.content = content
         if let key = messageKey {
@@ -85,10 +85,10 @@ struct SocketMessageFormat: Codable, Convertable {
         return format
     }
     
-    static func format(from: Data?, messageKey: String? = nil) -> SocketMessageFormat? {
+    static func format(from: Data?, messageKey: String? = nil) -> PPSocketMessageFormat? {
         if let data = from {
             let decoder = JSONDecoder()
-            if var model = try? decoder.decode(SocketMessageFormat.self, from: data) {
+            if var model = try? decoder.decode(PPSocketMessageFormat.self, from: data) {
                 if let key = messageKey {
                     model.messageKey = key
                 }
@@ -99,7 +99,7 @@ struct SocketMessageFormat: Codable, Convertable {
     }
 }
 
-class SocketBaseManager: NSObject {
+class PPSocketBaseManager: NSObject {
     
     /// 18, 事件名称, 无业务意义, 仅用作判断相同消息
     /// 2, 数据类型, 00: 默认, json, 01: 文件
@@ -112,7 +112,7 @@ class SocketBaseManager: NSObject {
     
     // MARK: - 发消息
     /// 消息管理, 当前的消息体, 任务自动跟随执行
-    var currentSendMessageTask: SendMessageTask?
+    var currentSendMessageTask: PPSocketSendMessageTask?
     /// 多消息排序发送, 可以发送json, 或者file
     lazy var sendMessageQueue: PPCustomOperationQueue = {
         let queue = PPCustomOperationQueue()
@@ -122,7 +122,7 @@ class SocketBaseManager: NSObject {
     
     /// 直接发送数据, 直传(尽量文件不用直传, 采用文件专门的传输, 或者文件传输的时候, key用文件自己的key)
     @discardableResult
-    func sendDirectionData(socket: GCDAsyncSocket?, data: Data?, messageKey: String? = nil, progressBlock: ReceiveMessageTaskBlock? = nil, receiveBlock: ReceiveMessageTaskBlock?) -> String {
+    func sendDirectionData(socket: GCDAsyncSocket?, data: Data?, messageKey: String? = nil, progressBlock: PPReceiveMessageTaskBlock? = nil, receiveBlock: PPReceiveMessageTaskBlock?) -> String {
         let operation = PPCustomAsyncOperation()
         if let messageKey = messageKey, messageKey.count > 0 {
             operation.identifier = messageKey
@@ -130,7 +130,7 @@ class SocketBaseManager: NSObject {
             operation.identifier = String.GenerateRandomString(length: 18)
         }
         operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
-            self?.currentSendMessageTask = SendMessageTask()
+            self?.currentSendMessageTask = PPSocketSendMessageTask()
             self?.currentSendMessageTask?.hasAllMessageDone = false
             self?.currentSendMessageTask?.messageType = .directionData
             self?.currentSendMessageTask?.toSendDirectionData = data ?? Data()
@@ -139,7 +139,7 @@ class SocketBaseManager: NSObject {
             //            }
             self?.currentSendMessageTask?.sendMessageIndex = operation.identifier
             if progressBlock != nil || receiveBlock != nil, let messageKey = self?.currentSendMessageTask?.sendMessageIndex, messageKey.count > 0 {
-                let messageBody = ReceiveMessageTask()
+                let messageBody = PPSocketReceiveMessageTask()
                 messageBody.messageKey = messageKey
                 messageBody.didReceiveDataProgressBlock = progressBlock
                 messageBody.didReceiveDataCompleteBlock = receiveBlock
@@ -165,7 +165,7 @@ class SocketBaseManager: NSObject {
             operation.identifier = String.GenerateRandomString(length: 18)
         }
         operation.mainOperationDoBlock = { [weak self] (operation) -> Bool in
-            self?.currentSendMessageTask = SendMessageTask()
+            self?.currentSendMessageTask = PPSocketSendMessageTask()
             self?.currentSendMessageTask?.hasAllMessageDone = false
             self?.currentSendMessageTask?.messageType = .fileData
             self?.currentSendMessageTask?.readFilePath = filePath
@@ -218,7 +218,7 @@ class SocketBaseManager: NSObject {
     }
     
     /// 分包发送数据
-    func sendCellBodyData(socket: GCDAsyncSocket?, bodyData: Data, messageType: TransMessageType, totalBodyCount: Int, index: Int) {
+    func sendCellBodyData(socket: GCDAsyncSocket?, bodyData: Data, messageType: PPSocketTransMessageType, totalBodyCount: Int, index: Int) {
         guard let messageCode = currentSendMessageTask?.sendMessageIndex else {
             return
         }
@@ -228,10 +228,10 @@ class SocketBaseManager: NSObject {
     }
     
     /// 发消息给对方, 告诉他, 这个任务我要取消
-    func sendToCancelTask(socket: GCDAsyncSocket?, messageKey: String, receiveBlock: ReceiveMessageTaskBlock?) {
-        let format = SocketMessageFormat.format(action: .requestToCancelTask, content: messageKey)
+    func sendToCancelTask(socket: GCDAsyncSocket?, messageKey: String, receiveBlock: PPReceiveMessageTaskBlock?) {
+        let format = PPSocketMessageFormat.format(action: .requestToCancelTask, content: messageKey)
         print("发送取消任务: \(self), \(format)")
-        self.sendDirectionData(socket: socket, data: format.convertToJsonData()) { [weak self] messageTask in
+        self.sendDirectionData(socket: socket, data: format.pp_convertToJsonData()) { [weak self] messageTask in
             guard let self = self else { return }
             self.releaseReceiveMessageTask(messageKey)
             print("发送取消任务: \(self), 收到回复, \(messageTask?.description ?? "")");
@@ -241,15 +241,15 @@ class SocketBaseManager: NSObject {
     
     /// 取消当前发送的任务(可能正在发, 可能正在收), 取消发和收的任务
     /// - Parameter messageKey: 任务id, 如果为空, 表示清空所有任务
-    func cancelSendingTask(socket: GCDAsyncSocket?, content: String?, messageKey: String?, receiveBlock: ReceiveMessageTaskBlock?) {
+    func cancelSendingTask(socket: GCDAsyncSocket?, content: String?, messageKey: String?, receiveBlock: PPReceiveMessageTaskBlock?) {
         
         // 首先停止当前的发送任务
         if self.currentSendMessageTask?.sendMessageIndex == content, let messageKey = messageKey, messageKey.count > 0 {
             self.currentSendMessageTask = nil
-            var format = SocketMessageFormat.format(action: .responseToCancelTask, content: content)
+            var format = PPSocketMessageFormat.format(action: .responseToCancelTask, content: content)
             format.messageKey = messageKey
             print("发送取消任务结束回复, \(self), \(format)")
-            self.sendDirectionData(socket: socket, data: format.convertToJsonData(), messageKey: messageKey, progressBlock: nil, receiveBlock: nil)
+            self.sendDirectionData(socket: socket, data: format.pp_convertToJsonData(), messageKey: messageKey, progressBlock: nil, receiveBlock: nil)
         }
         
         // 然后停止队列中的任务
@@ -298,7 +298,7 @@ class SocketBaseManager: NSObject {
     }
     
     // MARK: - 收消息
-    private var receivedMessageDic: [String: ReceiveMessageTask] = [:]
+    private var receivedMessageDic: [String: PPSocketReceiveMessageTask] = [:]
     
     private func releaseReceiveMessageTask(_ messageKey: String) {
         if let receiveMessage = self.receivedMessageDic[messageKey] {
@@ -332,27 +332,27 @@ class SocketBaseManager: NSObject {
     }
     
     /// 收到文件列表请求
-    func receiveRequestFileList(_ messageFormat: SocketMessageFormat) {
+    func receiveRequestFileList(_ messageFormat: PPSocketMessageFormat) {
         
     }
     
     /// 收到文件列表回复
-    func receiveResponseFileList(_ messageFormat: SocketMessageFormat) {
+    func receiveResponseFileList(_ messageFormat: PPSocketMessageFormat) {
         
     }
     
     /// 收到下载文件请求
-    func receiveRequestToDownloadFile(_ messageFormat: SocketMessageFormat) {
+    func receiveRequestToDownloadFile(_ messageFormat: PPSocketMessageFormat) {
         
     }
     
     /// 收到取消任务请求
-    func receiveRequestToCancelTask(_ messageFormat: SocketMessageFormat) {
+    func receiveRequestToCancelTask(_ messageFormat: PPSocketMessageFormat) {
         
     }
     
     /// 收到取消任务回复
-    func receiveResponseToCancelTask(_ messageFormat: SocketMessageFormat) {
+    func receiveResponseToCancelTask(_ messageFormat: PPSocketMessageFormat) {
         
     }
     
@@ -384,7 +384,7 @@ class SocketBaseManager: NSObject {
             
             var messageBody = self.receivedMessageDic[messageKey]
             if nil == messageBody {
-                messageBody = ReceiveMessageTask()
+                messageBody = PPSocketReceiveMessageTask()
                 messageBody?.messageKey = messageKey
                 self.receivedMessageDic[messageKey] = messageBody
             }
@@ -395,7 +395,7 @@ class SocketBaseManager: NSObject {
             messageBody?.bodyIndex = bodyIndex
             
             // 根据messageTypeStr区分是文件, 还是json, 选择合适的方式拼接data
-            switch TransMessageType(rawValue: messageType) {
+            switch PPSocketTransMessageType(rawValue: messageType) {
             case .directionData:
                 self.doReceiveData(messageBody!, data: data, parseIndex: parseIndex)
             case .fileData: do {
@@ -408,7 +408,7 @@ class SocketBaseManager: NSObject {
     }
     
     /// 处理收到的文件数据
-    func doReceiveFile(_ messageBody: ReceiveMessageTask, data: Data, parseIndex: Int) {
+    func doReceiveFile(_ messageBody: PPSocketReceiveMessageTask, data: Data, parseIndex: Int) {
         autoreleasepool {
             guard let messageKey = messageBody.messageKey else {
                 return
@@ -451,7 +451,7 @@ class SocketBaseManager: NSObject {
     }
     
     /// 处理收到的data数据
-    final func doReceiveData(_ messageBody: ReceiveMessageTask, data: Data, parseIndex: Int) {
+    final func doReceiveData(_ messageBody: PPSocketReceiveMessageTask, data: Data, parseIndex: Int) {
         autoreleasepool {
             guard let messageKey = messageBody.messageKey else {
                 return
@@ -475,22 +475,22 @@ class SocketBaseManager: NSObject {
                 
                 
                 // 这里可以封装给子类实现, 由子类去具体解析某些事件 ============================
-                if let messageFormat = SocketMessageFormat.format(from: messageBody.directionData!, messageKey: messageKey) {
+                if let messageFormat = PPSocketMessageFormat.format(from: messageBody.directionData!, messageKey: messageKey) {
                     switch messageFormat.action {
-                    case GSActions.requestFileList.getActionString():
+                    case PPSocketActions.requestFileList.getActionString():
                         self.receiveRequestFileList(messageFormat)
                         break
-                    case GSActions.responseFileList.getActionString():
+                    case PPSocketActions.responseFileList.getActionString():
                         self.receiveResponseFileList(messageFormat)
                         break
-                    case GSActions.requestToDownloadFile.getActionString():
+                    case PPSocketActions.requestToDownloadFile.getActionString():
                         self.receiveRequestToDownloadFile(messageFormat)
                         break
-                    case GSActions.requestToCancelTask.getActionString():
+                    case PPSocketActions.requestToCancelTask.getActionString():
                         // 取消任务
                         self.receiveRequestToCancelTask(messageFormat)
                         break
-                    case GSActions.responseToCancelTask.getActionString():
+                    case PPSocketActions.responseToCancelTask.getActionString():
                         // 取消任务
                         self.receiveResponseToCancelTask(messageFormat)
                         break

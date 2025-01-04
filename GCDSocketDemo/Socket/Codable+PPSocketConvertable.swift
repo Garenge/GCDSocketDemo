@@ -1,5 +1,5 @@
 //
-//  Codable+Covertable.swift
+//  Codable+PPSocketConvertable.swift
 //  Exercise
 //
 //  Created by pengpeng on 2024/2/22.
@@ -7,12 +7,12 @@
 
 import Foundation
 
-protocol Convertable: Codable {
+protocol PPSocketConvertable: Codable {
 }
 
-extension Convertable {
+extension PPSocketConvertable {
 
-    func convertToDict() -> [String: Any]? {
+    func pp_convertToDict() -> [String: Any]? {
 
         var var_dict: [String: Any]?
 
@@ -32,7 +32,7 @@ extension Convertable {
         return var_dict
     }
     
-    func convertToJsonData() -> Data? {
+    func pp_convertToJsonData() -> Data? {
         do {
             let encoder = JSONEncoder()
             return try encoder.encode(self)
@@ -43,12 +43,12 @@ extension Convertable {
     }
 }
 
-extension Array where Element: Convertable {
-    func convertToDictArray() -> [[String: Any]]? {
-        return self.compactMap { $0.convertToDict() }
+extension Array where Element: PPSocketConvertable {
+    func pp_convertToDictArray() -> [[String: Any]]? {
+        return self.compactMap { $0.pp_convertToDict() }
     }
     
-    func convertToJsonData() -> Data? {
+    func pp_convertToJsonData() -> Data? {
         do {
             let encoder = JSONEncoder()
             return try encoder.encode(self)

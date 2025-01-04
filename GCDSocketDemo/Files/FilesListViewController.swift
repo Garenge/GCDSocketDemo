@@ -6,10 +6,11 @@
 //
 
 import UIKit
+import PPToolKit
 
 class FilesListViewController: UIViewController {
     
-    var client: ClientSocketManager?
+    var client: PPClientSocketManager?
     lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.delegate = self
@@ -21,12 +22,12 @@ class FilesListViewController: UIViewController {
     var currentDirectory: String = ""
     
     /// 当前下载的文件
-    var currentDownloadFile: FileModel?
+    var currentDownloadFile: PPFileModel?
     
     /// 当前下载任务的id
     var currentDownloadTaskId: String?
     
-    var dataList: [FileModel] = []
+    var dataList: [PPFileModel] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,7 +69,7 @@ extension FilesListViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
         
         let fileModel = dataList[indexPath.row]
-        let fileSize = NSString.fileSizeFormat(Int64(fileModel.fileSize))
+        let fileSize = NSString.pp_fileSizeFormat(Int64(fileModel.fileSize))
         cell.imageView?.image = fileModel.isFolder ? UIImage(systemName: "folder") : UIImage(systemName: "document")
         if fileModel.isFolder {
             cell.textLabel?.text = "\(fileModel.fileName ?? "")"

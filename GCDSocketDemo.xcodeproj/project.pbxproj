@@ -8,23 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		81C996EF1F8FAD39E278D471 /* Pods_GCDSocketDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */; };
-		9D03F12E2CFC7AA900AE4BA0 /* SocketBaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F12D2CFC7AA900AE4BA0 /* SocketBaseManager.swift */; };
-		9D03F1302CFCA1A500AE4BA0 /* ReceiveMessageTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */; };
+		9D03F12E2CFC7AA900AE4BA0 /* PPSocketBaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F12D2CFC7AA900AE4BA0 /* PPSocketBaseManager.swift */; };
+		9D03F1302CFCA1A500AE4BA0 /* PPSocketReceiveMessageTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F12F2CFCA1A500AE4BA0 /* PPSocketReceiveMessageTask.swift */; };
 		9D03F1322CFE022500AE4BA0 /* PPCatalystPlugin.bundle in Embed PlugIns */ = {isa = PBXBuildFile; fileRef = 9D03F1312CFE022500AE4BA0 /* PPCatalystPlugin.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9D03F1342CFE023E00AE4BA0 /* PPCatalystPlugin.bundle in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D03F1312CFE022500AE4BA0 /* PPCatalystPlugin.bundle */; };
-		9D03F1372CFE071E00AE4BA0 /* Codable+Covertable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F1362CFE071E00AE4BA0 /* Codable+Covertable.swift */; };
-		9D0B6D9B2CEF6FD600FA009F /* SendMessageTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */; };
+		9D03F1372CFE071E00AE4BA0 /* Codable+PPSocketConvertable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03F1362CFE071E00AE4BA0 /* Codable+PPSocketConvertable.swift */; };
+		9D0B6D9B2CEF6FD600FA009F /* PPSocketSendMessageTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0B6D9A2CEF6FD600FA009F /* PPSocketSendMessageTask.swift */; };
 		9D0FA6F02A1488830091D0E7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */; };
 		9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */; };
 		9D0FA6F42A1488830091D0E7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F32A1488830091D0E7 /* ViewController.swift */; };
 		9D0FA6F72A1488830091D0E7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F52A1488830091D0E7 /* Main.storyboard */; };
 		9D0FA6F92A1488840091D0E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6F82A1488840091D0E7 /* Assets.xcassets */; };
 		9D0FA6FC2A1488840091D0E7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D0FA6FA2A1488840091D0E7 /* LaunchScreen.storyboard */; };
-		9D0FA7042A1489F50091D0E7 /* ServerSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */; };
-		9D0FA7062A1489FE0091D0E7 /* ClientSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */; };
-		9D2C7EFB2D1810A300702B89 /* GSDefine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2C7EFA2D1810A300702B89 /* GSDefine.swift */; };
+		9D0FA7042A1489F50091D0E7 /* PPServerSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7032A1489F50091D0E7 /* PPServerSocketManager.swift */; };
+		9D0FA7062A1489FE0091D0E7 /* PPClientSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0FA7052A1489FE0091D0E7 /* PPClientSocketManager.swift */; };
+		9D2C7EFB2D1810A300702B89 /* PPSocketActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2C7EFA2D1810A300702B89 /* PPSocketActions.swift */; };
 		9DCADB922D181C060039719D /* FilesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DCADB912D181C060039719D /* FilesListViewController.swift */; };
-		9DCADB962D1820400039719D /* NSString+Ex.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DCADB952D1820400039719D /* NSString+Ex.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,12 +42,12 @@
 
 /* Begin PBXFileReference section */
 		3530C4EA06DBE6910019F4D5 /* Pods_GCDSocketDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GCDSocketDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9D03F12D2CFC7AA900AE4BA0 /* SocketBaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketBaseManager.swift; sourceTree = "<group>"; };
-		9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveMessageTask.swift; sourceTree = "<group>"; };
+		9D03F12D2CFC7AA900AE4BA0 /* PPSocketBaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPSocketBaseManager.swift; sourceTree = "<group>"; };
+		9D03F12F2CFCA1A500AE4BA0 /* PPSocketReceiveMessageTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPSocketReceiveMessageTask.swift; sourceTree = "<group>"; };
 		9D03F1312CFE022500AE4BA0 /* PPCatalystPlugin.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = PPCatalystPlugin.bundle; path = Pods/PPCatalystTool/PPCatalystPlugin/Products/PPCatalystPlugin.bundle; sourceTree = "<group>"; };
-		9D03F1362CFE071E00AE4BA0 /* Codable+Covertable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Codable+Covertable.swift"; sourceTree = "<group>"; };
+		9D03F1362CFE071E00AE4BA0 /* Codable+PPSocketConvertable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Codable+PPSocketConvertable.swift"; sourceTree = "<group>"; };
 		9D0675722CF24F8800C4E797 /* GCDSocketDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GCDSocketDemo.entitlements; sourceTree = "<group>"; };
-		9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMessageTask.swift; sourceTree = "<group>"; };
+		9D0B6D9A2CEF6FD600FA009F /* PPSocketSendMessageTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPSocketSendMessageTask.swift; sourceTree = "<group>"; };
 		9D0FA6EC2A1488830091D0E7 /* GCDSocketDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GCDSocketDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0FA6EF2A1488830091D0E7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9D0FA6F12A1488830091D0E7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -57,13 +56,11 @@
 		9D0FA6F82A1488840091D0E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9D0FA6FB2A1488840091D0E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9D0FA6FD2A1488840091D0E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSocketManager.swift; sourceTree = "<group>"; };
-		9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientSocketManager.swift; sourceTree = "<group>"; };
+		9D0FA7032A1489F50091D0E7 /* PPServerSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPServerSocketManager.swift; sourceTree = "<group>"; };
+		9D0FA7052A1489FE0091D0E7 /* PPClientSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPClientSocketManager.swift; sourceTree = "<group>"; };
 		9D0FA70B2A1495950091D0E7 /* GCDSocketDemo-Brigding-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GCDSocketDemo-Brigding-Header.h"; sourceTree = "<group>"; };
-		9D2C7EFA2D1810A300702B89 /* GSDefine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSDefine.swift; sourceTree = "<group>"; };
+		9D2C7EFA2D1810A300702B89 /* PPSocketActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPSocketActions.swift; sourceTree = "<group>"; };
 		9DCADB912D181C060039719D /* FilesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesListViewController.swift; sourceTree = "<group>"; };
-		9DCADB942D1820400039719D /* NSString+Ex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Ex.h"; sourceTree = "<group>"; };
-		9DCADB952D1820400039719D /* NSString+Ex.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Ex.m"; sourceTree = "<group>"; };
 		DD03948A9DD25EBA0088A7E6 /* Pods-GCDSocketDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GCDSocketDemo.release.xcconfig"; path = "Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo.release.xcconfig"; sourceTree = "<group>"; };
 		E330B0528B2C627878E6B58C /* Pods-GCDSocketDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GCDSocketDemo.debug.xcconfig"; path = "Target Support Files/Pods-GCDSocketDemo/Pods-GCDSocketDemo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -102,13 +99,13 @@
 		9D03F12C2CFC7A8000AE4BA0 /* Socket */ = {
 			isa = PBXGroup;
 			children = (
-				9D03F12D2CFC7AA900AE4BA0 /* SocketBaseManager.swift */,
-				9D0FA7032A1489F50091D0E7 /* ServerSocketManager.swift */,
-				9D0FA7052A1489FE0091D0E7 /* ClientSocketManager.swift */,
-				9D0B6D9A2CEF6FD600FA009F /* SendMessageTask.swift */,
-				9D03F12F2CFCA1A500AE4BA0 /* ReceiveMessageTask.swift */,
-				9D03F1362CFE071E00AE4BA0 /* Codable+Covertable.swift */,
-				9D2C7EFA2D1810A300702B89 /* GSDefine.swift */,
+				9D03F12D2CFC7AA900AE4BA0 /* PPSocketBaseManager.swift */,
+				9D0FA7032A1489F50091D0E7 /* PPServerSocketManager.swift */,
+				9D0FA7052A1489FE0091D0E7 /* PPClientSocketManager.swift */,
+				9D0B6D9A2CEF6FD600FA009F /* PPSocketSendMessageTask.swift */,
+				9D03F12F2CFCA1A500AE4BA0 /* PPSocketReceiveMessageTask.swift */,
+				9D03F1362CFE071E00AE4BA0 /* Codable+PPSocketConvertable.swift */,
+				9D2C7EFA2D1810A300702B89 /* PPSocketActions.swift */,
 			);
 			path = Socket;
 			sourceTree = "<group>";
@@ -161,8 +158,6 @@
 		9DCADB932D181FB80039719D /* Category */ = {
 			isa = PBXGroup;
 			children = (
-				9DCADB942D1820400039719D /* NSString+Ex.h */,
-				9DCADB952D1820400039719D /* NSString+Ex.m */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -283,17 +278,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9D03F12E2CFC7AA900AE4BA0 /* SocketBaseManager.swift in Sources */,
+				9D03F12E2CFC7AA900AE4BA0 /* PPSocketBaseManager.swift in Sources */,
 				9D0FA6F42A1488830091D0E7 /* ViewController.swift in Sources */,
 				9D0FA6F02A1488830091D0E7 /* AppDelegate.swift in Sources */,
-				9D0FA7042A1489F50091D0E7 /* ServerSocketManager.swift in Sources */,
-				9DCADB962D1820400039719D /* NSString+Ex.m in Sources */,
-				9D0B6D9B2CEF6FD600FA009F /* SendMessageTask.swift in Sources */,
+				9D0FA7042A1489F50091D0E7 /* PPServerSocketManager.swift in Sources */,
+				9D0B6D9B2CEF6FD600FA009F /* PPSocketSendMessageTask.swift in Sources */,
 				9D0FA6F22A1488830091D0E7 /* SceneDelegate.swift in Sources */,
-				9D03F1372CFE071E00AE4BA0 /* Codable+Covertable.swift in Sources */,
-				9D03F1302CFCA1A500AE4BA0 /* ReceiveMessageTask.swift in Sources */,
-				9D2C7EFB2D1810A300702B89 /* GSDefine.swift in Sources */,
-				9D0FA7062A1489FE0091D0E7 /* ClientSocketManager.swift in Sources */,
+				9D03F1372CFE071E00AE4BA0 /* Codable+PPSocketConvertable.swift in Sources */,
+				9D03F1302CFCA1A500AE4BA0 /* PPSocketReceiveMessageTask.swift in Sources */,
+				9D2C7EFB2D1810A300702B89 /* PPSocketActions.swift in Sources */,
+				9D0FA7062A1489FE0091D0E7 /* PPClientSocketManager.swift in Sources */,
 				9DCADB922D181C060039719D /* FilesListViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

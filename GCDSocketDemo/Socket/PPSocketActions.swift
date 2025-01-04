@@ -1,5 +1,5 @@
 //
-//  GSDefine.swift
+//  PPSocketActions.swift
 //  GCDSocketDemo
 //
 //  Created by Garenge on 2024/12/4.
@@ -8,7 +8,7 @@
 import Foundation
 
 /// 长度小于18的字符串, 在前面补0, 补齐18
-enum GSActions: String {
+enum PPSocketActions: String {
     
     /// 请求文件列表
     case requestFileList

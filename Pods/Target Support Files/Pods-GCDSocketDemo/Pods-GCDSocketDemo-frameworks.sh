@@ -177,14 +177,18 @@ code_sign_if_enabled() {
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/Masonry/Masonry.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/PPCatalystTool/PPCatalystTool.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/PPCustomAsyncOperation/PPCustomAsyncOperation.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/PPToolKit/PPToolKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/Masonry/Masonry.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/PPCatalystTool/PPCatalystTool.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/PPCustomAsyncOperation/PPCustomAsyncOperation.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/PPToolKit/PPToolKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework"
 fi
 if [ "${COCOAPODS_PARALLEL_CODE_SIGN}" == "true" ]; then

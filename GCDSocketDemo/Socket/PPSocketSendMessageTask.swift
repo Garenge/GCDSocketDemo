@@ -7,16 +7,16 @@
 
 import UIKit
 
-enum TransMessageType: Int {
+enum PPSocketTransMessageType: Int {
     /// 数据直传
     case directionData = 0
     /// 大文件, 分包传
     case fileData = 1
 }
 
-class SendMessageTask: NSObject {
+class PPSocketSendMessageTask: NSObject {
     
-    public var messageType: TransMessageType = .directionData
+    public var messageType: PPSocketTransMessageType = .directionData
     
     /// 标记当前任务的序号, 可以理解为唯一标识
     var sendMessageIndex = String.GenerateRandomString(length: 18) {
@@ -217,7 +217,7 @@ class SendMessageTask: NSObject {
     }
     
     /// 创建最终发送的数据包体
-    func createSendCellBodyData(bodyData: Data, messageCode: String, messageType: TransMessageType, totalBodyCount: Int, index: Int) -> Data {
+    func createSendCellBodyData(bodyData: Data, messageCode: String, messageType: PPSocketTransMessageType, totalBodyCount: Int, index: Int) -> Data {
         var sendData = Data()
         
         //18个长度, 区分分包数据

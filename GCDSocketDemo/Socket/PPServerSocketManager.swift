@@ -8,7 +8,7 @@
 import Foundation
 import PPCustomAsyncOperation
 
-class ServerSocketManager: SocketBaseManager {
+class PPServerSocketManager: PPSocketBaseManager {
     
     lazy var socket: GCDAsyncSocket = {
         let socket = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
@@ -28,14 +28,14 @@ class ServerSocketManager: SocketBaseManager {
     
     let rootPath = "/Users/garenge/Downloads"
     
-    override func receiveRequestFileList(_ messageFormat: SocketMessageFormat) {
+    override func receiveRequestFileList(_ messageFormat: PPSocketMessageFormat) {
         print("Server 收到文件列表请求")
         print(messageFormat)
         
         self.sendFolderList(folderPath: messageFormat.content, messageKey: messageFormat.messageKey)
     }
     
-    override func receiveRequestToDownloadFile(_ messageFormat: SocketMessageFormat) {
+    override func receiveRequestToDownloadFile(_ messageFormat: PPSocketMessageFormat) {
         print("Server 收到下载文件请求")
         print(messageFormat)
         guard let content = messageFormat.content else {
@@ -45,7 +45,7 @@ class ServerSocketManager: SocketBaseManager {
         self.sendFile(filePath: content, messageKey: messageFormat.messageKey)
     }
     
-    override func receiveRequestToCancelTask(_ messageFormat: SocketMessageFormat) {
+    override func receiveRequestToCancelTask(_ messageFormat: PPSocketMessageFormat) {
         print("Server 收到取消任务请求")
         print(messageFormat)
         self.cancelSendingTask(socket: self.clientSocket, content: messageFormat.content, messageKey: messageFormat.messageKey, receiveBlock: nil)
@@ -53,7 +53,7 @@ class ServerSocketManager: SocketBaseManager {
     
 }
 
-extension ServerSocketManager {
+extension PPServerSocketManager {
     
     /// 发送消息
     func sendTestMessage() {
@@ -81,8 +81,8 @@ extension ServerSocketManager {
         let filePath = (rootPath as NSString).appendingPathComponent(folderPath ?? "")
         do {
             let fileList = try FileManager.default.contentsOfDirectory(atPath: filePath)
-            var models: [FileModel] = fileList.map({ fileName in
-                var fileModel = FileModel()
+            var models: [PPFileModel] = fileList.map({ fileName in
+                var fileModel = PPFileModel()
                 fileModel.filePath = (filePath as NSString).appendingPathComponent(fileName)
                 
                 return fileModel
@@ -102,12 +102,12 @@ extension ServerSocketManager {
                 }
             }
             
-            guard let jsonData = models.convertToJsonData(), let responseStr = String(data: jsonData, encoding: .utf8) else {
+            guard let jsonData = models.pp_convertToJsonData(), let responseStr = String(data: jsonData, encoding: .utf8) else {
                 self.sendDirectionData(socket: self.clientSocket, data: nil, messageKey: messageKey, receiveBlock: nil)
                 return
             }
-            let messageFormat = SocketMessageFormat.format(action: .responseFileList, content: responseStr, messageKey: messageKey)
-            self.sendDirectionData(socket: self.clientSocket, data: messageFormat.convertToJsonData(), messageKey: messageKey, receiveBlock: nil)
+            let messageFormat = PPSocketMessageFormat.format(action: .responseFileList, content: responseStr, messageKey: messageKey)
+            self.sendDirectionData(socket: self.clientSocket, data: messageFormat.pp_convertToJsonData(), messageKey: messageKey, receiveBlock: nil)
         } catch {
             print("Server 获取文件列表失败: \(error)")
             self.sendDirectionData(socket: self.clientSocket, data: nil, messageKey: messageKey, receiveBlock: nil)
@@ -116,10 +116,10 @@ extension ServerSocketManager {
     
     /// 发送文件信息
     func sendFileInfo(filePath: String) {
-        var fileModel = FileModel()
+        var fileModel = PPFileModel()
         fileModel.filePath = filePath
         
-        guard let jsonDic = fileModel.convertToDict(), let jsonData = try? JSONSerialization.data(withJSONObject: jsonDic, options: .prettyPrinted) else {
+        guard let jsonDic = fileModel.pp_convertToDict(), let jsonData = try? JSONSerialization.data(withJSONObject: jsonDic, options: .prettyPrinted) else {
             return
         }
         self.sendDirectionData(socket: self.clientSocket, data: jsonData, receiveBlock: nil)
@@ -132,7 +132,7 @@ extension ServerSocketManager {
     
 }
 
-extension ServerSocketManager: GCDAsyncSocketDelegate {
+extension PPServerSocketManager: GCDAsyncSocketDelegate {
     
     func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         print("Server 已连接 \(host):\(port)")

@@ -8,10 +8,10 @@
 import UIKit
 
 /// 将ReceiveMessageTask直接回调给client还是有点不合适的, 暴露的信息过多, 最好是整理一个新的数据模型, 然后回调给client
-typealias ReceiveMessageTaskBlock = (_ messageTask: ReceiveMessageTask?) -> ()
+typealias PPReceiveMessageTaskBlock = (_ messageTask: PPSocketReceiveMessageTask?) -> ()
 
 /// 收消息的模型
-class ReceiveMessageTask: NSObject {
+class PPSocketReceiveMessageTask: NSObject {
     
     deinit {
         print("======== ReceiveMessageTask \(self) deinit ========")
@@ -51,7 +51,7 @@ class ReceiveMessageTask: NSObject {
     }
     
     /// 数据类型
-    var messageType: TransMessageType = .directionData
+    var messageType: PPSocketTransMessageType = .directionData
     
     /// 文件才有, 文件路径
     var filePath: String?
@@ -62,9 +62,9 @@ class ReceiveMessageTask: NSObject {
     var directionData: Data?
     
     /// 收到数据结束回调
-    public var didReceiveDataCompleteBlock: ReceiveMessageTaskBlock?
+    public var didReceiveDataCompleteBlock: PPReceiveMessageTaskBlock?
     /// 收到数据过程回调
-    public var didReceiveDataProgressBlock: ReceiveMessageTaskBlock?
+    public var didReceiveDataProgressBlock: PPReceiveMessageTaskBlock?
     
     /// 网速回调
     public var toReceiveTransSpeedChangedBlock: ((_ speed: UInt64) -> ())?

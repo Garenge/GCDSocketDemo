@@ -43,8 +43,8 @@ class ViewController: UIViewController {
 #endif
     }
 
-    let server = ServerSocketManager()
-    let client = ClientSocketManager()
+    let server = PPServerSocketManager()
+    let client = PPClientSocketManager()
     
     @IBAction func startServer(_ sender: Any) {
         self.view.endEditing(true)

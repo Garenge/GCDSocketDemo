@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ClientSocketManager: SocketBaseManager {
+class PPClientSocketManager: PPSocketBaseManager {
     
     lazy var socket: GCDAsyncSocket = {
         let socket = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
@@ -29,24 +29,24 @@ class ClientSocketManager: SocketBaseManager {
     
     
     /// 这个方法其实不会相应, 因为一对一的任务, 基本已经在block中回调了, 如果实现了block, 就不会走这个自定义方法
-    override func receiveResponseFileList(_ messageFormat: SocketMessageFormat) {
+    override func receiveResponseFileList(_ messageFormat: PPSocketMessageFormat) {
         print("Client 收到文件列表响应")
         print(messageFormat)
     }
     /// 这个方法其实不会相应, 因为一对一的任务, 基本已经在block中回调了, 如果实现了block, 就不会走这个自定义方法
-    override func receiveResponseToCancelTask(_ messageFormat: SocketMessageFormat) {
+    override func receiveResponseToCancelTask(_ messageFormat: PPSocketMessageFormat) {
         print("Client 收到取消任务响应")
         print(messageFormat)
     }
     
     /// 取消任务
-    func cancelRequest(_ messageKey: String?, receiveBlock: ReceiveMessageTaskBlock?) {
+    func cancelRequest(_ messageKey: String?, receiveBlock: PPReceiveMessageTaskBlock?) {
         self.cancelSendingTask(socket: self.socket, content: messageKey, messageKey: nil, receiveBlock: receiveBlock)
     }
     
 }
 
-extension ClientSocketManager {
+extension PPClientSocketManager {
     
     /// 发送消息
     func sendTestMessage() {
@@ -69,16 +69,16 @@ extension ClientSocketManager {
     }
     
     /// 获取文件列表
-    func sendQueryFileList(_ path: String? = nil, finished: ((_ fileList: [FileModel]?) -> Void)?) {
-        let format = SocketMessageFormat.format(action: .requestFileList, content: path)
-        self.sendDirectionData(socket: self.socket, data: format.convertToJsonData(), receiveBlock: { messageTask in
+    func sendQueryFileList(_ path: String? = nil, finished: ((_ fileList: [PPFileModel]?) -> Void)?) {
+        let format = PPSocketMessageFormat.format(action: .requestFileList, content: path)
+        self.sendDirectionData(socket: self.socket, data: format.pp_convertToJsonData(), receiveBlock: { messageTask in
             print("Client 发送文件列表请求, 收到回复, \(messageTask?.description ?? "")");
-            guard let messageTask = messageTask, let messageFormat = SocketMessageFormat.format(from: messageTask.directionData!, messageKey: messageTask.messageKey), messageFormat.action == GSActions.responseFileList.getActionString() else {
+            guard let messageTask = messageTask, let messageFormat = PPSocketMessageFormat.format(from: messageTask.directionData!, messageKey: messageTask.messageKey), messageFormat.action == PPSocketActions.responseFileList.getActionString() else {
                 finished?(nil)
                 return
             }
             let jsonDecoder = JSONDecoder()
-            guard let content = messageFormat.content, let data = content.data(using: .utf8), let fileList = try? jsonDecoder.decode([FileModel].self, from: data) else {
+            guard let content = messageFormat.content, let data = content.data(using: .utf8), let fileList = try? jsonDecoder.decode([PPFileModel].self, from: data) else {
                 finished?(nil)
                 return
             }
@@ -86,12 +86,12 @@ extension ClientSocketManager {
         })
     }
     
-    func sendDownloadRequest(filePath: String?, progressBlock: ReceiveMessageTaskBlock? = nil, receiveBlock: ReceiveMessageTaskBlock? = nil) -> String? {
+    func sendDownloadRequest(filePath: String?, progressBlock: PPReceiveMessageTaskBlock? = nil, receiveBlock: PPReceiveMessageTaskBlock? = nil) -> String? {
         guard let filePath = filePath else {
             return nil
         }
-        let format = SocketMessageFormat.format(action: .requestToDownloadFile, content: filePath)
-        let messageKey = self.sendDirectionData(socket: self.socket, data: format.convertToJsonData()) { messageTask in
+        let format = PPSocketMessageFormat.format(action: .requestToDownloadFile, content: filePath)
+        let messageKey = self.sendDirectionData(socket: self.socket, data: format.pp_convertToJsonData()) { messageTask in
             guard let messageTask = messageTask else { return }
 //            print("Client 下载文件 进度: \(String(format: "%.2f", messageTask.progress * 100))%")
             progressBlock?(messageTask)
@@ -118,7 +118,7 @@ extension ClientSocketManager {
     }
 }
 
-extension ClientSocketManager: GCDAsyncSocketDelegate {
+extension PPClientSocketManager: GCDAsyncSocketDelegate {
     
     func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         print("Client 已连接 \(host):\(port)")
