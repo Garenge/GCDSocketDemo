@@ -114,10 +114,8 @@ static PPCatalystHandle *_instance;
 
     NSURL *selectedFileURL = [self performSelfMethodWithString:selectorString target:bundleClass object:folderPath];
     NSLog(@"我选中了%@", selectedFileURL);
-    // 获取文件大小 / 信息
-    NSDictionary *fileInfo = [NSFileManager.defaultManager attributesOfItemAtPath:selectedFileURL.path error:nil];
-    uint64 fileSize = [fileInfo fileSize];
-    NSLog(@"文件大小: %llu", fileSize);
+    NSData *data = [NSData dataWithContentsOfURL:selectedFileURL];
+    NSLog(@"文件大小: %ld", data.length);
 
     return selectedFileURL;
 #else

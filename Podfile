@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-# platform :ios, '9.0'
+ platform :ios, '13.0'
 
 source 'https://github.com/Garenge/pengpengSpecs.git'
 source 'https://github.com/CocoaPods/Specs.git'
@@ -9,10 +9,19 @@ target 'GCDSocketDemo' do
   use_frameworks!
 
   # Pods for GCDSocketDemo
-  pod 'CocoaAsyncSocket'
   pod 'SnapKit'
-  pod 'PPCustomAsyncOperation'
   pod 'PPCatalystTool'
   pod 'PPToolKit' #, :git => 'https://github.com/Garenge/PPToolKit.git'
+  pod 'PPSocket' #, //:path => '../../SDK/PPSocket'
+#  pod 'PPCustomAsyncOperation', :path => '../../SDK/PPCustomAsyncOperation'
 
+  post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+      end
+    end
+  end
 end
+
+

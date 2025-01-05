@@ -8,10 +8,10 @@
 import UIKit
 
 /// 将ReceiveMessageTask直接回调给client还是有点不合适的, 暴露的信息过多, 最好是整理一个新的数据模型, 然后回调给client
-typealias PPReceiveMessageTaskBlock = (_ messageTask: PPSocketReceiveMessageTask?) -> ()
+public typealias PPReceiveMessageTaskBlock = (_ messageTask: PPSocketReceiveMessageTask?) -> ()
 
 /// 收消息的模型
-class PPSocketReceiveMessageTask: NSObject {
+public class PPSocketReceiveMessageTask: NSObject {
     
     deinit {
         print("======== ReceiveMessageTask \(self) deinit ========")

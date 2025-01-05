@@ -6,16 +6,17 @@
 //
 
 import Foundation
+import CocoaAsyncSocket
 import PPCustomAsyncOperation
 
-class PPServerSocketManager: PPSocketBaseManager {
+public class PPServerSocketManager: PPSocketBaseManager {
     
     lazy var socket: GCDAsyncSocket = {
         let socket = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
         return socket
     }()
     
-    func accept(port: UInt16 = 12123) {
+    public func accept(port: UInt16 = 12123) {
         do {
             try socket.accept(onPort: port)
             print("Server 监听端口 \(port) 成功")
@@ -56,7 +57,7 @@ class PPServerSocketManager: PPSocketBaseManager {
 extension PPServerSocketManager {
     
     /// 发送消息
-    func sendTestMessage() {
+    public func sendTestMessage() {
         // 模拟多任务队列
 //        do {
 //            // 构造一个json
@@ -115,7 +116,7 @@ extension PPServerSocketManager {
     }
     
     /// 发送文件信息
-    func sendFileInfo(filePath: String) {
+    public func sendFileInfo(filePath: String) {
         var fileModel = PPFileModel()
         fileModel.filePath = filePath
         
@@ -134,23 +135,23 @@ extension PPServerSocketManager {
 
 extension PPServerSocketManager: GCDAsyncSocketDelegate {
     
-    func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
+    public func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         print("Server 已连接 \(host):\(port)")
     }
     
-    func socket(_ sock: GCDAsyncSocket, didAcceptNewSocket newSocket: GCDAsyncSocket) {
+    public func socket(_ sock: GCDAsyncSocket, didAcceptNewSocket newSocket: GCDAsyncSocket) {
         print("Server accept new socket")
         self.clientSocket = newSocket
         self.clientSocket?.readData(withTimeout: -1, tag: 10086)
     }
     
-    func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
+    public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         print("Server 已断开: \(String(describing: err))")
         self.cancelAllSendOperation()
         self.cancelALLReceiveTask()
     }
     
-    func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
+    public func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
         // 将新收到的数据追加到缓冲区
         receiveBuffer.append(data)
         
@@ -182,7 +183,7 @@ extension PPServerSocketManager: GCDAsyncSocketDelegate {
         self.clientSocket?.readData(withTimeout: -1, tag: 10086)
     }
     
-    func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
+    public func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
 //        print("Server 已发送消息, tag:\(tag)")
         self.sendBodyMessage(socket: self.clientSocket)
     }

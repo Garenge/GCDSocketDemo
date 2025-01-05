@@ -7,6 +7,7 @@
 
 import UIKit
 import CryptoKit
+import CocoaAsyncSocket
 import PPCustomAsyncOperation
 
 extension String {
@@ -29,12 +30,12 @@ extension String {
 }
 
 
-struct PPFileModel: Codable, PPSocketConvertable {
+public struct PPFileModel: Codable, PPSocketConvertable {
     
     /// 文件名
-    var fileName: String?
+    public var fileName: String?
     /// 文件路径
-    var filePath: String? {
+    public var filePath: String? {
         didSet {
             if let path = filePath {
                 let url = URL(fileURLWithPath: path)
@@ -61,13 +62,13 @@ struct PPFileModel: Codable, PPSocketConvertable {
         }
     }
     /// 文件大小
-    var fileSize: UInt64 = 0
+    public var fileSize: UInt64 = 0
     /// 是否是文件夹
-    var isFolder: Bool = false
+    public var isFolder: Bool = false
     /// 文件后缀名
-    var pathExtension: String?
+    public var pathExtension: String?
     /// 此文件, 会对应一个本地的唯一key, 到时候client请求下载, server将key作为事件名称
-    var fileKey: String = String.GenerateRandomString()
+    public var fileKey: String = String.GenerateRandomString()
 }
 
 struct PPSocketMessageFormat: Codable, PPSocketConvertable {
@@ -99,7 +100,7 @@ struct PPSocketMessageFormat: Codable, PPSocketConvertable {
     }
 }
 
-class PPSocketBaseManager: NSObject {
+public class PPSocketBaseManager: NSObject {
     
     /// 18, 事件名称, 无业务意义, 仅用作判断相同消息
     /// 2, 数据类型, 00: 默认, json, 01: 文件

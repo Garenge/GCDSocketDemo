@@ -1,0 +1,6 @@
+framework module PPSocket {
+  umbrella header "PPSocket-umbrella.h"
+
+  export *
+  module * { export * }
+}

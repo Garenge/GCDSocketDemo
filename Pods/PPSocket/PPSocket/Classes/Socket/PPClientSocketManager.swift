@@ -6,15 +6,16 @@
 //
 
 import Foundation
+import CocoaAsyncSocket
 
-class PPClientSocketManager: PPSocketBaseManager {
+public class PPClientSocketManager: PPSocketBaseManager {
     
     lazy var socket: GCDAsyncSocket = {
         let socket = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
         return socket
     }()
     
-    func connect(host: String = "127.0.0.1", port: UInt16 = 12123) {
+    public func connect(host: String = "127.0.0.1", port: UInt16 = 12123) {
         if !self.socket.isConnected {
             do {
                 try self.socket.connect(toHost: host, onPort: port, withTimeout: -1)
@@ -40,7 +41,7 @@ class PPClientSocketManager: PPSocketBaseManager {
     }
     
     /// 取消任务
-    func cancelRequest(_ messageKey: String?, receiveBlock: PPReceiveMessageTaskBlock?) {
+    public func cancelRequest(_ messageKey: String?, receiveBlock: PPReceiveMessageTaskBlock?) {
         self.cancelSendingTask(socket: self.socket, content: messageKey, messageKey: nil, receiveBlock: receiveBlock)
     }
     
@@ -49,7 +50,7 @@ class PPClientSocketManager: PPSocketBaseManager {
 extension PPClientSocketManager {
     
     /// 发送消息
-    func sendTestMessage() {
+    public func sendTestMessage() {
         //        // 模拟多任务队列
         //        do {
         //            // 构造一个json
@@ -69,7 +70,7 @@ extension PPClientSocketManager {
     }
     
     /// 获取文件列表
-    func sendQueryFileList(_ path: String? = nil, finished: ((_ fileList: [PPFileModel]?) -> Void)?) {
+    public func sendQueryFileList(_ path: String? = nil, finished: ((_ fileList: [PPFileModel]?) -> Void)?) {
         let format = PPSocketMessageFormat.format(action: .requestFileList, content: path)
         self.sendDirectionData(socket: self.socket, data: format.pp_convertToJsonData(), receiveBlock: { messageTask in
             print("Client 发送文件列表请求, 收到回复, \(messageTask?.description ?? "")");
@@ -86,7 +87,7 @@ extension PPClientSocketManager {
         })
     }
     
-    func sendDownloadRequest(filePath: String?, progressBlock: PPReceiveMessageTaskBlock? = nil, receiveBlock: PPReceiveMessageTaskBlock? = nil) -> String? {
+    public func sendDownloadRequest(filePath: String?, progressBlock: PPReceiveMessageTaskBlock? = nil, receiveBlock: PPReceiveMessageTaskBlock? = nil) -> String? {
         guard let filePath = filePath else {
             return nil
         }
@@ -120,18 +121,18 @@ extension PPClientSocketManager {
 
 extension PPClientSocketManager: GCDAsyncSocketDelegate {
     
-    func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
+    public func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         print("Client 已连接 \(host):\(port)")
         self.socket.readData(withTimeout: -1, tag: 10086)
     }
     
-    func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
+    public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         print("Client 已断开: \(String(describing: err))")
         self.cancelAllSendOperation()
         self.cancelALLReceiveTask()
     }
     
-    func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
+    public func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
         
 //        print("Client 已收到消息:")
         // 将新收到的数据追加到缓冲区
@@ -161,7 +162,7 @@ extension PPClientSocketManager: GCDAsyncSocketDelegate {
         sock.readData(withTimeout: -1, tag: tag)
     }
     
-    func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
+    public func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
         print("Client 已发送消息")
         self.sendBodyMessage(socket: self.socket)
     }
