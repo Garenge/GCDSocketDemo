@@ -29,6 +29,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        
+        self.window?.windowScene?.sizeRestrictions?.minimumSize = CGSizeMake(400, 600)
+        self.window?.windowScene?.sizeRestrictions?.maximumSize = CGSizeMake(800, 600)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.window?.windowScene?.sizeRestrictions?.maximumSize = CGSizeMake(9999, 9999)
+        }
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
