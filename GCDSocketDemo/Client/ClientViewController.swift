@@ -17,6 +17,8 @@ class ClientViewController: UIViewController {
     
     let client = PPClientSocketManager()
     
+    var disConnectManually: Bool = false
+    
     var serverPort: String {
         if let port = self.serverPortTF.text, port.count > 0 {
             return port
@@ -48,6 +50,15 @@ class ClientViewController: UIViewController {
         client.doClientDidDisconnectClosure = { [weak self] (manager, socket, error) in
             self?.doLog("======== 客户端断开连接: \(socket)" + (error != nil ? ", error: \(error!)" : ""))
             self?.connectBtn.setTitle("客户端未连接, 点击连接", for: .normal)
+            if self?.disConnectManually != true {
+                self?.doLog("检测到连接断开, 5s后自动重连服务器")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    self?.tryToConnectAutomatically()
+                }
+            } else {
+                self?.disConnectManually = false
+                self?.doLog("手动断开连接, 不需要自动重连服务器")
+            }
         }
     }
     
@@ -65,13 +76,29 @@ class ClientViewController: UIViewController {
         if self.client.socket.isConnected {
             doLog("======== 开始断开服务器: \(serverHost):\(serverPort)")
             self.client.socket.disconnect()
+            self.disConnectManually = true
         } else {
-            doLog("======== 开始连接服务器: \(serverHost):\(serverPort)")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                self.client.connect(host: self.serverHost, port: UInt16(self.serverPort) ?? 12123)
-                UserDefaults.standard.set(self.serverHost, forKey: GSHostKey)
-                UserDefaults.standard.synchronize()
-            }
+            self.doConnectServer()
         }
+    }
+    
+    func doConnectServer() {
+        doLog("======== 开始连接服务器: \(serverHost):\(serverPort)")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.client.connect(host: self.serverHost, port: UInt16(self.serverPort) ?? 12123)
+            UserDefaults.standard.set(self.serverHost, forKey: GSHostKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
+    
+    // MARK: - timer
+    
+    @objc public func tryToConnectAutomatically() {
+        doLog("开始自动重连服务器...")
+        if self.client.socket.isConnected {
+            doLog("检测到Socket已连接, 无需重连")
+            return
+        }
+        self.doConnectServer()
     }
 }
