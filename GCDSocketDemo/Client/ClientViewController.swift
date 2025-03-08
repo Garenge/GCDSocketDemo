@@ -69,6 +69,8 @@ class ClientViewController: UIViewController {
         print("======== \(message)")
         let preString = self.receivedMessageTextView.text ?? ""
         self.receivedMessageTextView.text = preString + "\n" + message
+        let range = NSMakeRange(self.receivedMessageTextView.text.count - 1, 1)
+        self.receivedMessageTextView.scrollRangeToVisible(range)
     }
 
     @IBAction func doConnectServerBtnClickedAction(_ sender: Any) {
