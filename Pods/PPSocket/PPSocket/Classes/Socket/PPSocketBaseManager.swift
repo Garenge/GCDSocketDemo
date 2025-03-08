@@ -75,8 +75,9 @@ struct PPSocketMessageFormat: Codable, PPSocketConvertable {
     var action: String?
     var content: String?
     var messageKey: String = String.GenerateRandomString()
+    var errorCode: String?
     
-    static func format(action: PPSocketActions, content: String?, messageKey: String? = nil) -> PPSocketMessageFormat {
+    static func format(action: PPSocketActions, content: String?, messageKey: String? = nil, errorCode: String? = nil) -> PPSocketMessageFormat {
         var format = PPSocketMessageFormat()
         format.action = action.getActionString()
         format.content = content
@@ -122,6 +123,7 @@ public class PPSocketBaseManager: NSObject {
     }()
     
     /// 直接发送数据, 直传(尽量文件不用直传, 采用文件专门的传输, 或者文件传输的时候, key用文件自己的key)
+    /// 参数data传空的话, 最终不会给client回调, client认为超时即失败
     @discardableResult
     func sendDirectionData(socket: GCDAsyncSocket?, data: Data?, messageKey: String? = nil, progressBlock: PPReceiveMessageTaskBlock? = nil, receiveBlock: PPReceiveMessageTaskBlock?) -> String {
         let operation = PPCustomAsyncOperation()

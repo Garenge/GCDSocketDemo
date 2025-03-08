@@ -34,7 +34,7 @@ public class PPServerSocketManager: PPSocketBaseManager {
     public var doServerAcceptNewSocketClosure: ((_ manager: PPServerSocketManager, _ newSocket: GCDAsyncSocket) -> Void)?
     public var doServerLossClientSocketClosure: ((_ manager: PPServerSocketManager, _ newSocket: GCDAsyncSocket, _ err: Error?) -> Void)?
     
-    let rootPath = "/Users/garenge/Downloads"
+    public var rootPath = "/Users/garenge/Downloads"
     
     override func receiveRequestFileList(_ messageFormat: PPSocketMessageFormat) {
         print("Server 收到文件列表请求")
@@ -86,10 +86,14 @@ extension PPServerSocketManager {
     
     /// 发送文件夹下的文件列表 folderPath: 空表示根目录
     func sendFolderList(folderPath: String?, messageKey: String?) {
+        
+        var messageFormat = PPSocketMessageFormat.format(action: .responseFileList, content: nil, messageKey: messageKey)
+        
         let filePath = (rootPath as NSString).appendingPathComponent(folderPath ?? "")
+        var models: [PPFileModel] = []
         do {
             let fileList = try FileManager.default.contentsOfDirectory(atPath: filePath)
-            var models: [PPFileModel] = fileList.map({ fileName in
+            models = fileList.map({ fileName in
                 var fileModel = PPFileModel()
                 fileModel.filePath = (filePath as NSString).appendingPathComponent(fileName)
                 
@@ -109,17 +113,17 @@ extension PPServerSocketManager {
                     return inte1 > inte2
                 }
             }
-            
-            guard let jsonData = models.pp_convertToJsonData(), let responseStr = String(data: jsonData, encoding: .utf8) else {
-                self.sendDirectionData(socket: self.clientSocket, data: nil, messageKey: messageKey, receiveBlock: nil)
-                return
-            }
-            let messageFormat = PPSocketMessageFormat.format(action: .responseFileList, content: responseStr, messageKey: messageKey)
-            self.sendDirectionData(socket: self.clientSocket, data: messageFormat.pp_convertToJsonData(), messageKey: messageKey, receiveBlock: nil)
         } catch {
             print("Server 获取文件列表失败: \(error)")
-            self.sendDirectionData(socket: self.clientSocket, data: nil, messageKey: messageKey, receiveBlock: nil)
+            messageFormat.errorCode = "Server 获取文件列表失败"
         }
+        var responseStr: String?
+        if let jsonData = models.pp_convertToJsonData() {
+            responseStr = String(data: jsonData, encoding: .utf8)
+        }
+        messageFormat.content = responseStr
+        
+        self.sendDirectionData(socket: self.clientSocket, data: messageFormat.pp_convertToJsonData(), messageKey: messageKey, receiveBlock: nil)
     }
     
     /// 发送文件信息

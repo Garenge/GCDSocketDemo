@@ -14,6 +14,7 @@ class ClientViewController: UIViewController {
     @IBOutlet weak var serverAddressTF: UITextField!
     @IBOutlet weak var connectBtn: UIButton!
     @IBOutlet weak var receivedMessageTextView: UITextView!
+    @IBOutlet weak var showFileListBtn: UIButton!
     
     let client = PPClientSocketManager()
     
@@ -46,10 +47,12 @@ class ClientViewController: UIViewController {
         client.doClientDidConnectedClosure = { [weak self] (manager, socket) in
             self?.doLog("======== 客户端连接成功: \(socket)")
             self?.connectBtn.setTitle("客户端已连接, 点击断开", for: .normal)
+            self?.showFileListBtn.isHidden = false
         }
         client.doClientDidDisconnectClosure = { [weak self] (manager, socket, error) in
             self?.doLog("======== 客户端断开连接: \(socket)" + (error != nil ? ", error: \(error!)" : ""))
             self?.connectBtn.setTitle("客户端未连接, 点击连接", for: .normal)
+            self?.showFileListBtn.isHidden = true
             if self?.disConnectManually != true {
                 self?.doLog("检测到连接断开, 5s后自动重连服务器")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
@@ -102,5 +105,11 @@ class ClientViewController: UIViewController {
             return
         }
         self.doConnectServer()
+    }
+    
+    @IBAction func doShowFiles(_ sender: Any) {
+        let filesVC = FilesListViewController()
+        filesVC.client = client
+        self.navigationController?.pushViewController(filesVC, animated: true)
     }
 }

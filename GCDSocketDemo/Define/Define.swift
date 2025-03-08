@@ -9,3 +9,4 @@ import Foundation
 
 let GSHostKey = "GSHostKey"
 let GSPortKey = "GSPortKey"
+let GSRootFolderKey = "GSRootFolderKey"
