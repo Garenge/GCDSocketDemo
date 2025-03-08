@@ -10,7 +10,7 @@ import CocoaAsyncSocket
 
 public class PPClientSocketManager: PPSocketBaseManager {
     
-    lazy var socket: GCDAsyncSocket = {
+    public lazy var socket: GCDAsyncSocket = {
         let socket = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
         return socket
     }()
@@ -28,6 +28,10 @@ public class PPClientSocketManager: PPSocketBaseManager {
         }
     }
     
+    /// Socket连接成功
+    public var doClientDidConnectedClosure: ((_ manager: PPClientSocketManager, _ socket: GCDAsyncSocket) -> Void)?
+    /// Socket断开连接
+    public var doClientDidDisconnectClosure: ((_ manager: PPClientSocketManager, _ socket: GCDAsyncSocket, _ error: Error?) -> Void)?
     
     /// 这个方法其实不会相应, 因为一对一的任务, 基本已经在block中回调了, 如果实现了block, 就不会走这个自定义方法
     override func receiveResponseFileList(_ messageFormat: PPSocketMessageFormat) {
@@ -123,6 +127,7 @@ extension PPClientSocketManager: GCDAsyncSocketDelegate {
     
     public func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         print("Client 已连接 \(host):\(port)")
+        self.doClientDidConnectedClosure?(self, sock)
         self.socket.readData(withTimeout: -1, tag: 10086)
     }
     
@@ -130,6 +135,7 @@ extension PPClientSocketManager: GCDAsyncSocketDelegate {
         print("Client 已断开: \(String(describing: err))")
         self.cancelAllSendOperation()
         self.cancelALLReceiveTask()
+        self.doClientDidDisconnectClosure?(self, sock, err)
     }
     
     public func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {

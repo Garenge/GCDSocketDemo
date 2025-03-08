@@ -20,12 +20,19 @@ public class PPServerSocketManager: PPSocketBaseManager {
         do {
             try socket.accept(onPort: port)
             print("Server 监听端口 \(port) 成功")
+            self.doServerAcceptPortClosure?(self, port, nil)
         } catch {
             print("Server 监听端口 \(port) 失败: \(error)")
+            self.doServerAcceptPortClosure?(self, port, error as NSError)
         }
     }
     
-    var clientSocket: GCDAsyncSocket?
+    public var clientSocket: GCDAsyncSocket?
+    
+    public var doServerAcceptPortClosure: ((_ manager: PPServerSocketManager, _ port: UInt16, _ err: NSError?) -> Void)?
+    
+    public var doServerAcceptNewSocketClosure: ((_ manager: PPServerSocketManager, _ newSocket: GCDAsyncSocket) -> Void)?
+    public var doServerLossClientSocketClosure: ((_ manager: PPServerSocketManager, _ newSocket: GCDAsyncSocket, _ err: Error?) -> Void)?
     
     let rootPath = "/Users/garenge/Downloads"
     
@@ -143,12 +150,14 @@ extension PPServerSocketManager: GCDAsyncSocketDelegate {
         print("Server accept new socket")
         self.clientSocket = newSocket
         self.clientSocket?.readData(withTimeout: -1, tag: 10086)
+        self.doServerAcceptNewSocketClosure?(self, sock)
     }
     
     public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         print("Server 已断开: \(String(describing: err))")
         self.cancelAllSendOperation()
         self.cancelALLReceiveTask()
+        self.doServerLossClientSocketClosure?(self, sock, err)
     }
     
     public func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {

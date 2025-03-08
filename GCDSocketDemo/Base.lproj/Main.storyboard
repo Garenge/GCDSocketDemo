@@ -99,7 +99,7 @@
                                     <constraint firstAttribute="height" constant="44" id="qI4-X7-JVC"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="启动服务"/>
+                                <buttonConfiguration key="configuration" style="plain" title="服务端未开启, 点击开启"/>
                                 <connections>
                                     <action selector="doStartServerBtnClickedAction:" destination="eJE-Rn-kgA" eventType="touchUpInside" id="y7N-YL-t4c"/>
                                 </connections>
@@ -146,8 +146,8 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="收到消息" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sMD-Id-yaq">
-                                <rect key="frame" x="20" y="466" width="68" height="35"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="日志" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sMD-Id-yaq">
+                                <rect key="frame" x="20" y="466" width="34" height="35"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="il1-Fk-pah"/>
                                 </constraints>
@@ -196,6 +196,7 @@
                             <constraint firstItem="sMD-Id-yaq" firstAttribute="top" secondItem="56O-Iv-Dcn" secondAttribute="bottom" constant="20" id="O76-lN-Kns"/>
                             <constraint firstItem="Ila-IQ-qu1" firstAttribute="leading" secondItem="bar-KU-HgF" secondAttribute="leading" id="UZO-C9-YnI"/>
                             <constraint firstItem="bar-KU-HgF" firstAttribute="top" secondItem="VHZ-Rm-SLx" secondAttribute="bottom" constant="25" id="WDX-MN-vSY"/>
+                            <constraint firstItem="sMD-Id-yaq" firstAttribute="leading" secondItem="7Qw-Mo-7fx" secondAttribute="leading" id="Wum-tG-fKz"/>
                             <constraint firstItem="56O-Iv-Dcn" firstAttribute="top" secondItem="brt-0f-gHZ" secondAttribute="bottom" constant="24" id="Y28-VU-600"/>
                             <constraint firstItem="7Qw-Mo-7fx" firstAttribute="top" secondItem="6sI-1x-ptO" secondAttribute="top" constant="20" id="afE-s2-y4S"/>
                             <constraint firstItem="BIO-Us-OGH" firstAttribute="trailing" secondItem="7Qw-Mo-7fx" secondAttribute="trailing" id="aom-B2-1mm"/>
@@ -207,7 +208,6 @@
                             <constraint firstItem="1rP-zK-G5v" firstAttribute="height" secondItem="7Qw-Mo-7fx" secondAttribute="height" multiplier="0.75" id="fEm-YE-0E8"/>
                             <constraint firstItem="7Qw-Mo-7fx" firstAttribute="leading" secondItem="6sI-1x-ptO" secondAttribute="leading" constant="20" id="gfa-Ea-bit"/>
                             <constraint firstItem="BIO-Us-OGH" firstAttribute="leading" secondItem="7Qw-Mo-7fx" secondAttribute="leading" id="hdI-47-oqO"/>
-                            <constraint firstItem="sMD-Id-yaq" firstAttribute="leading" secondItem="6sI-1x-ptO" secondAttribute="leading" constant="20" id="j97-eU-ava"/>
                             <constraint firstItem="brt-0f-gHZ" firstAttribute="centerY" secondItem="1rP-zK-G5v" secondAttribute="centerY" id="lK1-Ys-MbM"/>
                             <constraint firstItem="bar-KU-HgF" firstAttribute="leading" secondItem="7Qw-Mo-7fx" secondAttribute="leading" id="mRF-P3-2RB"/>
                             <constraint firstItem="Ila-IQ-qu1" firstAttribute="trailing" secondItem="enx-t8-MB7" secondAttribute="trailing" id="mvH-wA-pQV"/>
@@ -225,6 +225,7 @@
                         <outlet property="receivedMessageTextView" destination="skQ-tq-bvL" id="sri-JC-yKr"/>
                         <outlet property="selectedRootPathLabel" destination="enx-t8-MB7" id="C9n-1w-Suw"/>
                         <outlet property="serverPortTF" destination="VHZ-Rm-SLx" id="jt2-nm-pgu"/>
+                        <outlet property="startServerBtn" destination="bar-KU-HgF" id="1NO-Sc-xhz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LFM-ct-n9s" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -246,11 +247,22 @@
                                     <constraint firstAttribute="height" constant="44" id="NIR-hx-xQE"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="客户端开始连接"/>
+                                <buttonConfiguration key="configuration" style="plain" title="客户端未连接, 点击连接"/>
                                 <connections>
                                     <action selector="doConnectServerBtnClickedAction:" destination="lhK-Xd-nNq" eventType="touchUpInside" id="OH7-iq-Xpn"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="服务器地址" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iis-EZ-2Fd">
+                                <rect key="frame" x="20" y="112" width="84.5" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="127.0.0.1" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ik1-T3-eM5">
+                                <rect key="frame" x="148" y="105.5" width="246" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="服务器端口" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MpS-tn-Raa">
                                 <rect key="frame" x="20" y="152.5" width="120" height="28"/>
                                 <constraints>
@@ -269,38 +281,51 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="服务器地址" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iis-EZ-2Fd">
-                                <rect key="frame" x="20" y="112" width="84.5" height="20.5"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="--" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="nOB-uW-cCZ">
+                                <rect key="frame" x="20" y="365.5" width="374" height="476.5"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="日志" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fUy-5t-jsE">
+                                <rect key="frame" x="20" y="310.5" width="34" height="35"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="jWI-92-auZ"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="127.0.0.1" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ik1-T3-eM5">
-                                <rect key="frame" x="148" y="105.5" width="246" height="34"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="u5R-dL-l9u"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="MvU-8Q-nxj" firstAttribute="centerY" secondItem="MpS-tn-Raa" secondAttribute="centerY" id="Aef-g2-1yw"/>
+                            <constraint firstItem="fUy-5t-jsE" firstAttribute="leading" secondItem="Iis-EZ-2Fd" secondAttribute="leading" id="Lk2-Ya-81I"/>
                             <constraint firstItem="MvU-8Q-nxj" firstAttribute="leading" secondItem="MpS-tn-Raa" secondAttribute="trailing" constant="8" id="MLQ-Bx-oen"/>
                             <constraint firstItem="MpS-tn-Raa" firstAttribute="top" secondItem="Iis-EZ-2Fd" secondAttribute="bottom" constant="20" id="Nn3-lb-rIJ"/>
+                            <constraint firstItem="u5R-dL-l9u" firstAttribute="bottom" secondItem="nOB-uW-cCZ" secondAttribute="bottom" constant="20" id="WuD-eN-6IP"/>
+                            <constraint firstItem="fUy-5t-jsE" firstAttribute="top" secondItem="bAB-F7-yUF" secondAttribute="bottom" constant="20" id="YCq-e2-OFV"/>
                             <constraint firstItem="Iis-EZ-2Fd" firstAttribute="top" secondItem="u5R-dL-l9u" secondAttribute="top" constant="20" id="bg0-NJ-wgl"/>
                             <constraint firstItem="u5R-dL-l9u" firstAttribute="trailing" secondItem="ik1-T3-eM5" secondAttribute="trailing" constant="20" id="d5I-gs-e9e"/>
                             <constraint firstItem="MpS-tn-Raa" firstAttribute="leading" secondItem="u5R-dL-l9u" secondAttribute="leading" constant="20" id="f0A-7i-dJW"/>
                             <constraint firstItem="bAB-F7-yUF" firstAttribute="leading" secondItem="Iis-EZ-2Fd" secondAttribute="leading" id="fZQ-hC-8v2"/>
                             <constraint firstItem="ik1-T3-eM5" firstAttribute="centerY" secondItem="Iis-EZ-2Fd" secondAttribute="centerY" id="hKR-zF-Nud"/>
                             <constraint firstItem="bAB-F7-yUF" firstAttribute="top" secondItem="MvU-8Q-nxj" secondAttribute="bottom" constant="60" id="jNZ-ym-L6g"/>
+                            <constraint firstItem="nOB-uW-cCZ" firstAttribute="top" secondItem="fUy-5t-jsE" secondAttribute="bottom" constant="20" id="ne8-6d-Cf0"/>
                             <constraint firstItem="bAB-F7-yUF" firstAttribute="trailing" secondItem="ik1-T3-eM5" secondAttribute="trailing" id="qwP-NU-9bn"/>
                             <constraint firstItem="u5R-dL-l9u" firstAttribute="trailing" secondItem="MvU-8Q-nxj" secondAttribute="trailing" constant="20" id="sb6-kd-i9i"/>
+                            <constraint firstItem="nOB-uW-cCZ" firstAttribute="leading" secondItem="u5R-dL-l9u" secondAttribute="leading" constant="20" id="um5-Nt-UL4"/>
+                            <constraint firstItem="u5R-dL-l9u" firstAttribute="trailing" secondItem="nOB-uW-cCZ" secondAttribute="trailing" constant="20" id="v9S-ml-MW3"/>
                             <constraint firstItem="ik1-T3-eM5" firstAttribute="leading" secondItem="MvU-8Q-nxj" secondAttribute="leading" id="wAH-ze-WfK"/>
                             <constraint firstItem="Iis-EZ-2Fd" firstAttribute="leading" secondItem="u5R-dL-l9u" secondAttribute="leading" constant="20" id="yjQ-y9-pzj"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Client" id="lbf-Zj-cx5"/>
                     <connections>
+                        <outlet property="connectBtn" destination="bAB-F7-yUF" id="hlg-v5-r6Q"/>
+                        <outlet property="receivedMessageTextView" destination="nOB-uW-cCZ" id="FUL-VJ-zuV"/>
                         <outlet property="serverAddressTF" destination="ik1-T3-eM5" id="P9m-ri-gHx"/>
                         <outlet property="serverPortTF" destination="MvU-8Q-nxj" id="E4x-it-MAh"/>
                     </connections>
@@ -318,10 +343,10 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemPinkColor">
-            <color red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
