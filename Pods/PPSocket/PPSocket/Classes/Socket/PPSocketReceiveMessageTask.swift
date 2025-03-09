@@ -42,7 +42,7 @@ public class PPSocketReceiveMessageTask: NSObject {
     }
     
     /// 大数据传输时的进度
-    var progress: Double {
+    public var progress: Double {
         if totalLength == 0 {
             return 0
         } else {

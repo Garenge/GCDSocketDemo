@@ -20,6 +20,8 @@ class FilesListViewController: UIViewController {
         return tableView
     }()
     
+    let progressView = UIProgressView()
+    
     var currentDirectory: String = ""
     
     /// 当前下载的文件
@@ -51,11 +53,19 @@ class FilesListViewController: UIViewController {
     
     func setupSubviews() {
         
+        progressView.isHidden = true
+        self.view.addSubview(progressView)
+        progressView.snp.makeConstraints { make in
+            make.left.right.equalToSuperview()
+            make.bottom.equalTo(self.view.snp_bottomMargin)
+            make.height.equalTo(2)
+        }
+        
         self.view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.top.equalTo(self.view.snp_topMargin)
-            make.bottom.equalTo(self.view.snp_bottomMargin)
+            make.bottom.equalTo(progressView.snp.top).offset(-2)
         }
     }
 
@@ -92,6 +102,9 @@ extension FilesListViewController: UITableViewDelegate, UITableViewDataSource {
                 // 下载取消, 置空
                 self?.currentDownloadFile = nil
                 self?.currentDownloadTaskId = nil
+                print("取消下载任务: \(currentDownloadTaskId)")
+                self?.progressView.isHidden = true
+                self?.progressView.setProgress(0, animated: true)
             })
             return
         }
@@ -106,12 +119,15 @@ extension FilesListViewController: UITableViewDelegate, UITableViewDataSource {
             alertVC.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
             alertVC.addAction(UIAlertAction(title: "下载", style: .default, handler: { [weak self] _ in
                 self?.currentDownloadFile = fileModel
+                self?.progressView.isHidden = false
                 self?.currentDownloadTaskId = self?.client?.sendDownloadRequest(filePath: fileModel.filePath, progressBlock: { messageTask in
-                    
+                    self?.progressView.setProgress(Float(messageTask?.progress ?? 0), animated: true)
                 }, receiveBlock: { messageTask in
                     // 下载完成, 置空
                     self?.currentDownloadFile = nil
                     self?.currentDownloadTaskId = nil
+                    self?.progressView.isHidden = true
+                    self?.progressView.setProgress(0, animated: false)
                 })
             }))
             self.present(alertVC, animated: true, completion: nil)

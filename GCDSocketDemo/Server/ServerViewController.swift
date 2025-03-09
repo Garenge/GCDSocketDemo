@@ -109,7 +109,7 @@ class ServerViewController: UIViewController {
         doLog("======== 打开服务, 开始监听端口: \(serverPort)")
     }
     
-    @IBAction func doSelectRootFolderPathBtnClickedAction(_ sender: Any) {
+    @IBAction func doSelectRootFolderPathBtnClickedAction(_ sender: UIButton) {
         doLog("======== 开始选择服务器目录")
         let result = PPCatalystHandle.shared().selectFolder(withPath: "~/Desktop")
         selectedRootPathLabel.text = result?.path
