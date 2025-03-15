@@ -12,7 +12,8 @@ target 'GCDSocketDemo' do
   pod 'SnapKit'
   pod 'PPCatalystTool'
   pod 'PPToolKit' #, :git => 'https://github.com/Garenge/PPToolKit.git'
-  pod 'PPSocket' #, //:path => '../../SDK/PPSocket'
+#  pod 'PPSocket' #, //:path => '../../SDK/PPSocket'
+pod 'PPSocket', :path => '../../SDK/PPSocket'
 #  pod 'PPCustomAsyncOperation', :path => '../../SDK/PPCustomAsyncOperation'
 
   post_install do |installer|
