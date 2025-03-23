@@ -59,9 +59,13 @@ class ClientViewController: UIViewController {
                     self?.tryToConnectAutomatically()
                 }
             } else {
-                self?.disConnectManually = false
+                self?.disConnectManually = true
                 self?.doLog("手动断开连接, 不需要自动重连服务器")
             }
+        }
+        client.doClientDidRemovedByServerClosure = { [weak self] (manager, socket) in
+            self?.disConnectManually = true
+            self?.doLog("被server主动移除, 断开连接, 不需要自动重连服务器")
         }
     }
     

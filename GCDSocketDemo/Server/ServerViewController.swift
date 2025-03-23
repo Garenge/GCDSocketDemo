@@ -76,7 +76,6 @@ class ServerViewController: UIViewController {
         }
         self.server.doServerAcceptNewSocketClosure = { [weak self] (manager, clientSocket) in
             self?.doLog("======== 服务端接受新连接: \(clientSocket)")
-//            self?.currentClientLabel.text = String(format: "%p", clientSocket)
         }
         self.server.doServerLossClientSocketClosure = { [weak self] (manager, clientSocket, error) in
             guard let self = self else {
@@ -87,7 +86,6 @@ class ServerViewController: UIViewController {
             self.clientTableView.reloadData()
             let height = self.clientSockets.count * 35
             self.clientTableViewHeight.constant = CGFloat(max(min(height, 140), 35))
-//            self?.currentClientLabel.text = "--"
         }
         self.server.didReceivedClientSocketDeviceName = { [weak self] (deviceName, clientSocket) in
             guard let self = self else {
@@ -98,7 +96,6 @@ class ServerViewController: UIViewController {
             self.clientTableView.reloadData()
             let height = self.clientSockets.count * 35
             self.clientTableViewHeight.constant = CGFloat(max(min(height, 140), 35))
-//            self?.currentClientLabel.text = deviceName ?? String(format: "%p", clientSocket)
         }
     }
     
@@ -150,9 +147,11 @@ class ServerViewController: UIViewController {
     
     
     @IBAction func doRemoveClientLabel(_ sender: Any) {
-        self.server.clientSocketDic.values.forEach({ sock in
-            sock.disconnect()
-        })
+        let selectedIndex = self.clientTableView.indexPathForSelectedRow?.row ?? 0
+        if self.clientSockets.count > selectedIndex {
+            // 移除设备
+            self.server.sendRemoveClient(toRemoveSock: self.clientSockets[selectedIndex])
+        }
     }
 
 }
