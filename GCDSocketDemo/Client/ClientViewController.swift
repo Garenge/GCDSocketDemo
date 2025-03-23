@@ -45,7 +45,7 @@ class ClientViewController: UIViewController {
         self.serverAddressTF.text = UserDefaults.standard.string(forKey: GSHostKey)
         
         client.doClientDidConnectedClosure = { [weak self] (manager, socket) in
-            self?.doLog("======== 客户端连接成功: \(socket)")
+            self?.doLog("======== 客户端连接成功服务端: \(socket)")
             self?.connectBtn.setTitle("客户端已连接, 点击断开", for: .normal)
             self?.showFileListBtn.isHidden = false
         }
@@ -96,6 +96,13 @@ class ClientViewController: UIViewController {
         }
     }
     
+    @IBAction func doTestAction(_ sender: Any) {
+        let deviceName = UIDevice.current.name
+        print("设备名称: \(deviceName)")
+        self.client.sendDeviceName(deviceName) { [weak self] (responseMsg, error) in
+            self?.doLog("发送设备名称, 收到回复: \(responseMsg ?? "--"), error: \(error?.description ?? "--")")
+        }
+    }
     // MARK: - timer
     
     @objc public func tryToConnectAutomatically() {
