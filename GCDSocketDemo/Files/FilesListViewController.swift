@@ -8,6 +8,7 @@
 import UIKit
 import PPToolKit
 import PPSocket
+import PPCustomAsyncOperation
 
 class FilesListViewController: UIViewController {
     
@@ -35,6 +36,7 @@ class FilesListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.title = "List"
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "一键下载", style: .plain, target: self, action: #selector(doDownloadAllFiles(_:)))
         self.view.backgroundColor = .white
         
         self.setupSubviews()
@@ -66,6 +68,34 @@ class FilesListViewController: UIViewController {
             make.left.right.equalToSuperview()
             make.top.equalTo(self.view.snp_topMargin)
             make.bottom.equalTo(progressView.snp.top).offset(-2)
+        }
+    }
+    
+    let downloadQueue = PPCustomOperationQueue()
+    
+    @objc func doDownloadAllFiles(_ sender: UIBarButtonItem) {
+        
+        for fileModel in dataList {
+            if fileModel.isFolder {
+                continue
+            }
+            
+            downloadQueue.addOperation(withIdentifier: fileModel.fileKey) { [weak self] operation in
+                guard let self = self else {
+                    return true
+                }
+                
+                Thread.sleep(forTimeInterval: 1)
+                let taskId = self.client?.sendDownloadRequest(filePath: fileModel.filePath, progressBlock: { messageTask in
+                    print("下载进度: \(messageTask?.progress ?? 0)")
+                }, receiveBlock: { messageTask in
+                    print("下载完成: \(messageTask?.filePath ?? "")")
+                    operation.finish()
+                })
+                return false
+            }
+            
+            
         }
     }
 
