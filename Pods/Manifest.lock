@@ -2,7 +2,7 @@ PODS:
   - CocoaAsyncSocket (7.6.5)
   - Masonry (1.1.0)
   - PPCatalystTool (1.0.5)
-  - PPCustomAsyncOperation (0.1.1)
+  - PPCustomAsyncOperation (0.1.3)
   - PPSocket (0.1.0):
     - CocoaAsyncSocket
     - PPCustomAsyncOperation
@@ -12,6 +12,7 @@ PODS:
 
 DEPENDENCIES:
   - PPCatalystTool
+  - PPCustomAsyncOperation (from `../../SDK/PPCustomAsyncOperation`)
   - PPSocket (from `../../SDK/PPSocket`)
   - PPToolKit
   - SnapKit
@@ -23,10 +24,11 @@ SPEC REPOS:
     - SnapKit
   https://github.com/Garenge/pengpengSpecs.git:
     - PPCatalystTool
-    - PPCustomAsyncOperation
     - PPToolKit
 
 EXTERNAL SOURCES:
+  PPCustomAsyncOperation:
+    :path: "../../SDK/PPCustomAsyncOperation"
   PPSocket:
     :path: "../../SDK/PPSocket"
 
@@ -34,11 +36,11 @@ SPEC CHECKSUMS:
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   PPCatalystTool: 559a8a9d308b93a015e0de477ed7072da4f74b42
-  PPCustomAsyncOperation: a9901452d6d5724d2c075535f7a16198a23eb8ee
+  PPCustomAsyncOperation: 5bc5f2200982da0411a3db64eb9d02702fef155f
   PPSocket: f12cbad08a94892ea0fb1fb47db1e2b2834fe783
   PPToolKit: b143ff6ffd86f80713bb57cb5429663deba53156
   SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
 
-PODFILE CHECKSUM: d3429e860352a8b454632acf788d9a071898ed45
+PODFILE CHECKSUM: 6a5a22ecfbc132510f1ce35136f905a41a97c13e
 
 COCOAPODS: 1.16.2
