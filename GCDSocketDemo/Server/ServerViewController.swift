@@ -41,7 +41,7 @@ class ServerViewController: UIViewController {
     }()
     
     /// 由于Mac catalyst有沙盒机制, 每次启动需要重新手动选择文件夹, 否则会无法访问本地文件夹
-    var selectedRootPath: String?
+    var selectedRootPath: String? = "/Users/garenge/Downloads"
     
     var serverPort: String {
         if let port = self.serverPortTF.text, port.count > 0 {
@@ -59,7 +59,7 @@ class ServerViewController: UIViewController {
         super.viewDidLoad()
         
         self.clientTableView.register(UITableViewCell.self, forCellReuseIdentifier: "UITableViewCell")
-        
+        self.selectedRootPathLabel.text = self.selectedRootPath
         self.serverPortTF.text = UserDefaults.standard.string(forKey: GSPortKey)
         
         self.server.doServerAcceptPortClosure = { [weak self] (manager, port, error) in
@@ -96,6 +96,13 @@ class ServerViewController: UIViewController {
             self.clientTableView.reloadData()
             let height = self.clientSockets.count * 35
             self.clientTableViewHeight.constant = CGFloat(max(min(height, 140), 35))
+        }
+        self.server.didReceiveDirectionDataBlock = { [weak self] (message, messageKey, clientSocket) in
+            guard let self = self else {
+                return
+            }
+            self.doLog("======== 服务端接收到客户端数据 - host:\(clientSocket.localHost ?? ""), port:\(clientSocket.localPort)")
+            self.doLog("======== 服务端接收到客户端数据: \(message ?? "空数据")")
         }
     }
     

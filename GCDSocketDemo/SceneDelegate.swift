@@ -30,8 +30,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
         
-        self.window?.windowScene?.sizeRestrictions?.minimumSize = CGSizeMake(400, 600)
-        self.window?.windowScene?.sizeRestrictions?.maximumSize = CGSizeMake(800, 600)
+        self.window?.windowScene?.sizeRestrictions?.minimumSize = CGSizeMake(400, 800)
+        self.window?.windowScene?.sizeRestrictions?.maximumSize = CGSizeMake(800, 800)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.window?.windowScene?.sizeRestrictions?.maximumSize = CGSizeMake(9999, 9999)

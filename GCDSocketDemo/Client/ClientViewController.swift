@@ -106,6 +106,9 @@ class ClientViewController: UIViewController {
         self.client.sendDeviceName(deviceName) { [weak self] (responseMsg, error) in
             self?.doLog("发送设备名称, 收到回复: \(responseMsg ?? "--"), error: \(error?.description ?? "--")")
         }
+        self.client.sendDirectionMessage(with: FileManager.default.getDocumentDirectory()) { [weak self] (message, error) in
+            self?.doLog("发送消息, 收到回复: \(message ?? "--"), error: \(error?.description ?? "--")")
+        }
     }
     // MARK: - timer
     
