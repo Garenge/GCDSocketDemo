@@ -41,12 +41,13 @@ class FilesListViewController: UIViewController {
         
         self.setupSubviews()
         
+        print("GCDSocketDemo/Files/FilesListViewController.swift#viewDidLoad: query file list started, directory=\(currentDirectory)")
         self.client?.sendQueryFileList(self.currentDirectory, finished: { fileList in
             guard let fileList = fileList else {
-                print("获取文件列表失败")
+                print("GCDSocketDemo/Files/FilesListViewController.swift#viewDidLoad: query file list failed, directory=\(self.currentDirectory)")
                 return
             }
-            print("获取文件列表成功: \(fileList.count)")
+            self.logFileList(fileList, directory: self.currentDirectory, scene: "viewDidLoad")
             self.dataList.removeAll()
             self.dataList.append(contentsOf: fileList)
             self.tableView.reloadData()
@@ -74,29 +75,77 @@ class FilesListViewController: UIViewController {
     let downloadQueue = PPCustomOperationQueue()
     
     @objc func doDownloadAllFiles(_ sender: UIBarButtonItem) {
+        sender.isEnabled = false
+        self.collectDownloadFiles(dataList) { [weak self, weak sender] fileList in
+            guard let self = self else {
+                return
+            }
+            sender?.isEnabled = true
+            print("GCDSocketDemo/Files/FilesListViewController.swift#doDownloadAllFiles: collect download files finished, count=\(fileList.count)")
+            let downloadVC = FilesDownloadListViewController()
+            downloadVC.client = self.client
+            downloadVC.fileList = fileList
+            self.navigationController?.pushViewController(downloadVC, animated: true)
+        }
+    }
+    
+    public func collectDownloadFiles(_ toDownloadFileList: [PPFileModel], finished: @escaping ([PPFileModel]) -> Void) {
+        var resultList: [PPFileModel] = []
+        var pendingFolderCount = 0
         
-        for fileModel in dataList {
-            if fileModel.isFolder {
+        func finishIfNeeded() {
+            if pendingFolderCount == 0 {
+                finished(resultList)
+            }
+        }
+        
+        for fileModel in toDownloadFileList {
+            if shouldSkipDownload(fileModel) {
+                let fileName = fileModel.fileName ?? ""
+                print("GCDSocketDemo/Files/FilesListViewController.swift#collectDownloadFiles: skip hidden item, name=\(fileName)")
                 continue
             }
             
-            downloadQueue.addOperation(withIdentifier: fileModel.fileKey) { [weak self] operation in
-                guard let self = self else {
-                    return true
-                }
-                
-                Thread.sleep(forTimeInterval: 1)
-                let taskId = self.client?.sendDownloadRequest(filePath: fileModel.filePath, progressBlock: { messageTask in
-                    print("下载进度: \(messageTask?.progress ?? 0)")
-                }, receiveBlock: { messageTask in
-                    print("下载完成: \(messageTask?.filePath ?? "")")
-                    operation.finish()
+            if fileModel.isFolder {
+                let folderPath = fileModel.filePath ?? ""
+                pendingFolderCount += 1
+                print("GCDSocketDemo/Files/FilesListViewController.swift#collectDownloadFiles: query folder started, path=\(folderPath)")
+                self.client?.sendQueryFileList(fileModel.filePath, finished: { fileList in
+                    guard let fileList = fileList else {
+                        print("GCDSocketDemo/Files/FilesListViewController.swift#collectDownloadFiles: query folder failed, path=\(folderPath)")
+                        pendingFolderCount -= 1
+                        finishIfNeeded()
+                        return
+                    }
+                    self.logFileList(fileList, directory: folderPath, scene: "collectDownloadFiles")
+                    self.collectDownloadFiles(fileList) { childFileList in
+                        resultList.append(contentsOf: childFileList)
+                        pendingFolderCount -= 1
+                        finishIfNeeded()
+                    }
                 })
-                return false
+            } else {
+                resultList.append(fileModel)
             }
-            
-            
         }
+        finishIfNeeded()
+    }
+    
+    private func shouldSkipDownload(_ fileModel: PPFileModel) -> Bool {
+        guard let fileName = fileModel.fileName, fileName.count > 0 else {
+            return false
+        }
+        return fileName.hasPrefix(".")
+    }
+    
+    private func logFileList(_ fileList: [PPFileModel], directory: String, scene: String) {
+        let folderCount = fileList.filter { $0.isFolder }.count
+        let fileCount = fileList.count - folderCount
+        let previewNames = fileList.prefix(5).map { fileModel in
+            let type = fileModel.isFolder ? "folder" : "file"
+            return "\(type):\(fileModel.fileName ?? "")"
+        }.joined(separator: ", ")
+        print("GCDSocketDemo/Files/FilesListViewController.swift#\(scene): query file list succeeded, directory=\(directory), total=\(fileList.count), folders=\(folderCount), files=\(fileCount), preview=[\(previewNames)]")
     }
 
 }
@@ -164,4 +213,3 @@ extension FilesListViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
 }
-
